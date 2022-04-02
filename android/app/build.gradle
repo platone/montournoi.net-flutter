@@ -55,8 +55,8 @@ android {
 
     defaultConfig {
         applicationId "net.montournoi"
-        minSdkVersion 30
-        targetSdkVersion 30
+        minSdkVersion 26
+        targetSdkVersion 32
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
