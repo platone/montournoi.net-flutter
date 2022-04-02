@@ -23,5 +23,22 @@ command-list: ## List console command list
 get: ## Get Application
 	$(FLUTTER) pub get
 
+i18n: ## Get i18n
+	$(FLUTTER) gen-l10n
+
+doctor: ## Get Doctor
+	$(FLUTTER) doctor -v
+
+uc: ## Get iOS
+	$(FLUTTER) upgrade
+	$(FLUTTER) clean
+    # pod install
+
+ios: ## Get Doctor
+	$(FLUTTER) build ios --release
+
+icons: ## Get Doctor
+	$(FLUTTER) pub run flutter_launcher_icons:main
+
 build: ## Build Application
 	$(FLUTTER) pub run build_runner build --delete-conflicting-outputs

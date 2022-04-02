@@ -13,6 +13,9 @@ Team _$TeamFromJson(Map<String, dynamic> json) => Team(
       textColor: json['textColor'] as String?,
       image: json['image'] as String?,
       country: json['country'] as String?,
+      players: (json['players'] as List<dynamic>?)
+          ?.map((e) => Player.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$TeamToJson(Team instance) => <String, dynamic>{
@@ -22,4 +25,5 @@ Map<String, dynamic> _$TeamToJson(Team instance) => <String, dynamic>{
       'textColor': instance.textColor,
       'image': instance.image,
       'country': instance.country,
+      'players': instance.players,
     };

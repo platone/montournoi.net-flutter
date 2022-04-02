@@ -24,4 +24,11 @@ class Date {
     }
     return "";
   }
+
+  static DateTime utc(String? date) {
+    if(null != date) {
+      return DateTime.parse(date.substring(0, date.length - 6));
+    }
+    return DateTime.fromMicrosecondsSinceEpoch(0);
+  }
 }

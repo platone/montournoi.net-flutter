@@ -15,6 +15,8 @@ import 'package:montournoi_net_flutter/utils/string.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:montournoi_net_flutter/utils/i18n.dart';
 
+import '../../utils/box.dart';
+
 class TournamentGroupsState extends State<TournamentGroups> {
 
   final List<ListItem> _items = [];
@@ -22,18 +24,25 @@ class TournamentGroupsState extends State<TournamentGroups> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) => getData());
+  }
+
+  getData() async {
     _populate();
   }
 
   void _populate() {
     EasyLoading.show(status: i18n.loadingLabel);
-    Webservice().load(Tournament.groups(widget.tournament.id)).then((results) => {
+    Webservice().load(Tournament.groups(context, widget.tournament.id)).then((results) => {
           setState(() => {
             buildItems(results),
           }),
           EasyLoading.dismiss()
         },
-        onError: (error) => {EasyLoading.showError(error.toString())});
+        onError: (error) => {
+          EasyLoading.dismiss(),
+          EasyLoading.showError(error.toString())
+        });
   }
 
   @override
@@ -41,7 +50,7 @@ class TournamentGroupsState extends State<TournamentGroups> {
     return Scaffold(
       body: Center(
         child: Container(
-          decoration: const BoxDecoration(color: Colors.blueAccent),
+          decoration: BoxDecoration(color: Theme.of(context).focusColor),
           child: ListView.builder(
             itemCount: _items.length,
             itemBuilder: _buildListViewItem,
@@ -147,7 +156,7 @@ class GroupItem implements ListItem {
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
                     group.name ?? "",
-                    style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.w900)
+                    style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)
                 ),
               ),
           ),
@@ -160,8 +169,8 @@ class GroupItem implements ListItem {
                 AppLocalizations.of(context)!.totalMatchEqual,
                 AppLocalizations.of(context)!.totalMatchLoose,
                 AppLocalizations.of(context)!.totalDiff,
-                18,
-                16,
+                14,
+                12,
                 FontWeight.w500,
                 FontWeight.w500,
             ),
@@ -191,7 +200,7 @@ class ResultItem implements ListItem {
                     padding: const EdgeInsets.only(left: 16.0),
                     child: Text(
                       data.team?.name ?? "",
-                      style: Theme.of(context).textTheme.headline5,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                   )
               ),
@@ -204,8 +213,8 @@ class ResultItem implements ListItem {
                     "${data.totalMatchEqual}",
                     "${data.totalMatchLoose}",
                     "${data.totalGoal! - data.totalFailure!}",
-                    22,
                     18,
+                    14,
                     FontWeight.w900,
                     FontWeight.w500,
                 ),
@@ -214,26 +223,15 @@ class ResultItem implements ListItem {
           ),
         ),
       ),
-      elevation: Constants.LIST_ELEVATION_LITTLE,
-      margin: const EdgeInsets.all(Constants.LIST_MARGIN_LITTLE),
-      shadowColor: Colors.blueAccent,
-    );
-  }
-
-  BoxDecoration boxDecoration(Team team) {
-    return BoxDecoration(
-      border: Border(
-        left: BorderSide(
-          color: HexColor(team.backgroundColor!),
-          width: 16.0,
-        ),
-      ),
+      elevation: Constants.LIST_ELEVATION,
+      margin: const EdgeInsets.all(Constants.LIST_MARGIN),
+      shadowColor: Theme.of(context).primaryColor,
     );
   }
 
   tileContainer(Team team, Widget widget) {
     return Container(
-      decoration: boxDecoration(team),
+      decoration: Box.boxDecorationTeam(team, 16.0),
       padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 0),
       child: widget,
     );

@@ -6,9 +6,12 @@ import 'package:montournoi_net_flutter/models/ranking.dart';
 import 'package:montournoi_net_flutter/models/result.dart';
 import 'package:montournoi_net_flutter/models/scorer.dart';
 import 'package:montournoi_net_flutter/models/team.dart';
+import 'package:montournoi_net_flutter/models/teamlight.dart';
 import 'package:montournoi_net_flutter/services/webservice.dart';
 import 'package:montournoi_net_flutter/utils/constants.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import '../utils/url.dart';
 
 part 'tournament.g.dart';
 
@@ -27,13 +30,14 @@ class Tournament {
   final String? sport;
   final String? name;
   final List<Category> categories;
+  final int? live;
 
   Tournament({required this.id,required this.endDate, required this.beginDate, required this.street, required this.additional, required this.city,
-    required this.zipcode, required this.phone, required this.email, required this.sport, required this.name, required this.categories});
+    required this.zipcode, required this.phone, required this.email, required this.sport, required this.name, required this.categories, required this.live});
 
-  static Resource<List<Tournament>> get all {
+  static Resource<List<Tournament>> all(context) {
     return Resource(
-        url: Constants.TOURNAMENTS_URL,
+        url: URL.url(context, URL.TOURNAMENTS_URL, null),
         parse: (response) {
           var list = json.decode(response.body) as List;
           var tournaments = List<Tournament>.empty(growable: true);
@@ -45,10 +49,10 @@ class Tournament {
         }
     );
   }
-
-  static Resource<List<Match>> matchs(id) {
+  
+  static Resource<List<Match>> matchs(context, id) {
     return Resource(
-        url: Constants.MATCHS_URL + "${id}",
+        url: URL.url(context, URL.MATCHS_URL, "${id}"),
         parse: (response) {
           var list = json.decode(response.body) as List;
           var matchs = List<Match>.empty(growable: true);
@@ -61,9 +65,9 @@ class Tournament {
     );
   }
 
-  static Resource<List<Ranking>> ranking(id) {
+  static Resource<List<Ranking>> ranking(context, id) {
     return Resource(
-        url: Constants.RANKING_URL + "${id}",
+        url: URL.url(context, URL.RANKING_URL, "/${id}"),
         parse: (response) {
           var list = json.decode(response.body) as List;
           var results = List<Ranking>.empty(growable: true);
@@ -76,9 +80,9 @@ class Tournament {
     );
   }
 
-  static Resource<List<Result>> groups(id) {
+  static Resource<List<Result>> groups(context, id) {
     return Resource(
-        url: Constants.GROUP_URL + "${id}",
+        url: URL.url(context, URL.GROUP_URL, "/${id}"),
         parse: (response) {
           var list = json.decode(response.body) as List;
           var results = List<Result>.empty(growable: true);
@@ -91,14 +95,14 @@ class Tournament {
     );
   }
 
-  static Resource<List<Team>> teams(id) {
+  static Resource<List<TeamLight>> teams(context, id) {
     return Resource(
-        url: Constants.TEAMS_URL + "${id}",
+        url: URL.url(context, URL.TEAMS_URL, "/${id}"),
         parse: (response) {
           var list = json.decode(response.body) as List;
-          var teams = List<Team>.empty(growable: true);
+          var teams = List<TeamLight>.empty(growable: true);
           for (var t in list) {
-            var team = Team.fromJson(t);
+            var team = TeamLight.fromJson(t);
             teams.add(team);
           }
           return teams;
@@ -106,9 +110,9 @@ class Tournament {
     );
   }
 
-  static Resource<List<Scorer>> scorers(id) {
+  static Resource<List<Scorer>> scorers(context, id) {
     return Resource(
-        url: Constants.SCORERS_URL + "${id}",
+        url: URL.url(context, URL.SCORERS_URL, "/${id}"),
         parse: (response) {
           var list = json.decode(response.body) as List;
           var scorers = List<Scorer>.empty(growable: true);
@@ -121,9 +125,9 @@ class Tournament {
     );
   }
 
-  static Resource<Tournament> one(id) {
+  static Resource<Tournament> one(context, id) {
     return Resource(
-        url: Constants.TOURNAMENT_URL + "${id}",
+        url: URL.url(context, URL.TOURNAMENT_URL, "/${id}"),
         parse: (response) {
           var map = json.decode(response.body) as Map;
           return Tournament.fromJson(map as Map<String, dynamic>);

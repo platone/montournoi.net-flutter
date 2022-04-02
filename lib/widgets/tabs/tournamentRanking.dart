@@ -10,6 +10,8 @@ import 'package:montournoi_net_flutter/utils/constants.dart';
 import 'package:montournoi_net_flutter/utils/i18n.dart';
 import 'package:montournoi_net_flutter/utils/string.dart';
 
+import '../../utils/box.dart';
+
 class TournamentRankingState extends State<TournamentRanking> {
 
   List<Ranking> _rankings = List.empty(growable: false);
@@ -17,17 +19,24 @@ class TournamentRankingState extends State<TournamentRanking> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) => getData());
+  }
+
+  getData() async {
     _populate();
   }
 
   void _populate() {
     EasyLoading.show(status: i18n.loadingLabel);
-    Webservice().load(Tournament.ranking(widget.tournament.id)).then((teams) => {
+    Webservice().load(Tournament.ranking(context, widget.tournament.id)).then((teams) => {
       setState(() => {
         _rankings = teams
       }),
       EasyLoading.dismiss()
-    }, onError: (error) => {EasyLoading.showError(error.toString())});
+    }, onError: (error) => {
+      EasyLoading.dismiss(),
+      EasyLoading.showError(error.toString())
+    });
   }
 
   @override
@@ -35,7 +44,7 @@ class TournamentRankingState extends State<TournamentRanking> {
     return Scaffold(
       body: Center(
         child: Container(
-          decoration: const BoxDecoration(color: Colors.blueAccent),
+          decoration: BoxDecoration(color: Theme.of(context).focusColor),
           child: ListView.builder(
             itemCount: _rankings.length,
             itemBuilder: _buildListViewItem,
@@ -68,7 +77,7 @@ class TournamentRankingState extends State<TournamentRanking> {
         ),
         elevation: Constants.LIST_ELEVATION,
         margin: const EdgeInsets.all(Constants.LIST_MARGIN),
-        shadowColor: Colors.blueAccent,
+        shadowColor: Theme.of(context).primaryColor,
       ),
     );
   }
@@ -122,20 +131,9 @@ class TournamentRankingState extends State<TournamentRanking> {
     );
   }
 
-  BoxDecoration boxDecoration(Team team) {
-    return BoxDecoration(
-      border: Border(
-        left: BorderSide(
-          color: HexColor(team.backgroundColor!),
-          width: 16.0,
-        ),
-      ),
-    );
-  }
-
   tileContainer(Team team, Widget widget) {
     return Container(
-      decoration: boxDecoration(team),
+      decoration: Box.boxDecorationTeam(team, 16.0),
       padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 0),
       child: widget,
     );
@@ -143,7 +141,7 @@ class TournamentRankingState extends State<TournamentRanking> {
 
   TextStyle textStyle(double size) {
     return TextStyle(
-        color: Color(0xFF000000),
+        color: const Color(0xFF000000),
         fontSize: size,
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w500

@@ -34,26 +34,33 @@ class StringUtils {
     return 0;
   }
   static String type(Event? event, BuildContext context) {
-    switch(event?.type) {
+    return StringUtils.event(event?.type, context).substring(0, 3).toUpperCase();
+  }
+  static String event(String? type, BuildContext context) {
+    switch(type) {
       case "TYPE_GOAL":
-        return AppLocalizations.of(context)!.typeGoal.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typeGoal;
       case "TYPE_PENALTY":
-        return AppLocalizations.of(context)!.typePenalty.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typePenalty;
       case "TYPE_PENALTY_SHOT":
-        return AppLocalizations.of(context)!.typePenaltyShot.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typePenaltyShot;
       case "TYPE_FACEOFF":
-        return AppLocalizations.of(context)!.typeFaceOff.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typeFaceOff;
       case "TYPE_KEEPER_SAVE":
-        return AppLocalizations.of(context)!.typeKeeperSave.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typeKeeperSave;
       case "TYPE_FACEOFF_TRUE":
-        return AppLocalizations.of(context)!.typeFaceOffTrue.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typeFaceOffTrue;
       case "TYPE_KEEPER_SAVE_TRUE":
-        return AppLocalizations.of(context)!.typeKeeperSaveTrue.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typeKeeperSaveTrue;
       case "TYPE_FACEOFF_FALSE":
-        return AppLocalizations.of(context)!.typeFaceOffFalse.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typeFaceOffFalse;
       case "TYPE_KEEPER_SAVE_FALSE":
-        return AppLocalizations.of(context)!.typeKeeperSaveFalse.substring(0, 3).toUpperCase();
+        return AppLocalizations.of(context)!.typeKeeperSaveFalse;
     }
     return "";
+  }
+
+  static String location(Tournament tournament) {
+    return '${tournament.street} ${tournament.additional} ${tournament.zipcode} ${tournament.city}';
   }
 }

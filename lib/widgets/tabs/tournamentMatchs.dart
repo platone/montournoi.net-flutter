@@ -6,11 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:montournoi_net_flutter/models/match.dart';
 import 'package:montournoi_net_flutter/models/team.dart';
 import 'package:montournoi_net_flutter/models/tournament.dart';
-import 'package:montournoi_net_flutter/screens/liveScreen.dart';
+import 'package:montournoi_net_flutter/widgets/screens/liveScreen.dart';
 import 'package:montournoi_net_flutter/services/webservice.dart';
 import 'package:montournoi_net_flutter/utils/constants.dart';
 import 'package:montournoi_net_flutter/utils/string.dart';
 import 'package:montournoi_net_flutter/utils/i18n.dart';
+
+import '../../utils/box.dart';
+import '../../utils/date.dart';
 
 class TournamentMatchsState extends State<TournamentMatchs> {
 
@@ -19,6 +22,10 @@ class TournamentMatchsState extends State<TournamentMatchs> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) => getData());
+  }
+
+  getData() async {
     _populate();
   }
 
@@ -29,7 +36,7 @@ class TournamentMatchsState extends State<TournamentMatchs> {
 
   void _populate() {
     EasyLoading.show(status: i18n.loadingLabel);
-    Webservice().load(Tournament.matchs(widget.tournament.id)).then(
+    Webservice().load(Tournament.matchs(context, widget.tournament.id)).then(
         (matchs) => {
               setState(() => {
                     _matchs = matchs
@@ -38,7 +45,10 @@ class TournamentMatchsState extends State<TournamentMatchs> {
                   }),
               EasyLoading.dismiss()
             },
-        onError: (error) => {EasyLoading.showError(error.toString())});
+        onError: (error) => {
+          EasyLoading.dismiss(),
+          EasyLoading.showError(error.toString())
+        });
   }
 
   bool accept(Match element) {
@@ -59,7 +69,7 @@ class TournamentMatchsState extends State<TournamentMatchs> {
     return Scaffold(
       body: Center(
         child: Container(
-          decoration: const BoxDecoration(color: Colors.blueAccent),
+          decoration: BoxDecoration(color: Theme.of(context).focusColor),
           child: ListView.builder(
             itemCount: _matchs.length,
             itemBuilder: _buildListViewItem,
@@ -91,42 +101,42 @@ class TournamentMatchsState extends State<TournamentMatchs> {
         .length;
     return ListTile(
       title: Card(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8, left: 4, right: 8, bottom: 4),
-          child: InkWell(
-            splashColor: Colors.red.withAlpha(30),
-            onTap: () {
-              _openLive(_matchs[index]);
-            },
-            child: Container(
-              height: Constants.MATCHS_HEIGHT,
-              color: Colors.white,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: padding(
-                        receiver(index, context, receiverScore > visitorScore),
-                        context),
-                    flex: 5,
+        child: Container(
+            decoration: Box.boxDecorationTeams(_matchs[index].receiver, _matchs[index].visitor, 16.0),
+            child: InkWell(
+                splashColor: Colors.red.withAlpha(30),
+                onTap: () {
+                  _openLive(_matchs[index]);
+                },
+                child: Container(
+                  height: Constants.MATCHS_HEIGHT,
+                  color: Colors.white,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: padding(
+                            receiver(index, context, receiverScore > visitorScore),
+                            context),
+                        flex: 5,
+                      ),
+                      Expanded(
+                        child: score(index, context, receiverScore, visitorScore),
+                        flex: 3,
+                      ),
+                      Expanded(
+                        child: padding(
+                            visitor(index, context, visitorScore > receiverScore),
+                            context),
+                        flex: 5,
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: score(index, context, receiverScore, visitorScore),
-                    flex: 2,
-                  ),
-                  Expanded(
-                    child: padding(
-                        visitor(index, context, visitorScore > receiverScore),
-                        context),
-                    flex: 5,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
         ),
         elevation: Constants.LIST_ELEVATION,
         margin: const EdgeInsets.all(Constants.LIST_MARGIN),
-        shadowColor: Colors.blueAccent,
+        shadowColor: Theme.of(context).primaryColor,
       ),
     );
   }
@@ -139,13 +149,11 @@ class TournamentMatchsState extends State<TournamentMatchs> {
           child: Container(
             height: Constants.MATCHS_HEIGHT,
             color: Colors.white,
-            child: Align(
-              child: Text(
+            child: Text(
                 _matchs[index].name ?? "",
                 style: textStyle(false),
                 textAlign: TextAlign.center,
               ),
-            ),
           ),
         ),
         elevation: Constants.LIST_ELEVATION,
@@ -196,7 +204,7 @@ class TournamentMatchsState extends State<TournamentMatchs> {
           textAlign: textAlign,
         ),
       ),
-      flex: 3,
+      flex: 4,
     );
   }
 
@@ -217,19 +225,12 @@ class TournamentMatchsState extends State<TournamentMatchs> {
   }
 
   TextStyle scoresStyle(bool bold) {
-    if (bold) {
-      return const TextStyle(
-          color: Color(0xFF000000),
-          fontSize: 22,
-          fontStyle: FontStyle.normal,
-          fontWeight: FontWeight.bold);
-    } else {
-      return const TextStyle(
-          color: Color(0xFF000000),
-          fontSize: 22,
-          fontStyle: FontStyle.normal,
-          fontWeight: FontWeight.normal);
-    }
+    return TextStyle(
+        color: const Color(0xFF000000),
+        fontSize: 22,
+        fontStyle: FontStyle.normal,
+        fontWeight: bold ? FontWeight.bold : FontWeight.normal
+    );
   }
 
   TextStyle dateStyle() {
@@ -242,21 +243,13 @@ class TournamentMatchsState extends State<TournamentMatchs> {
   }
 
   TextStyle textStyle(bool bold) {
-    if (bold) {
-      return const TextStyle(
-        color: Color(0xFF000000),
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.bold,
-      );
-    } else {
-      return const TextStyle(
-        color: Color(0xFF000000),
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.normal,
-      );
-    }
+    return TextStyle(
+      color: const Color(0xFF000000),
+      fontSize: 16,
+      fontStyle: FontStyle.normal,
+      fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+      overflow: TextOverflow.ellipsis,
+    );
   }
 
   TextStyle scoreStyle() {
@@ -268,10 +261,9 @@ class TournamentMatchsState extends State<TournamentMatchs> {
     );
   }
 
-  Widget score(
-      int index, BuildContext context, int receiverScore, int visitorScore) {
+  Widget score(int index, BuildContext context, int receiverScore, int visitorScore) {
     var now = DateTime.now();
-    var date = DateTime.parse(_matchs[index].startDate!);
+    var date = Date.utc(_matchs[index].startDate);
     if (now.isAfter(date)) {
       return scoreValue(index, receiverScore, visitorScore);
     }
@@ -279,7 +271,7 @@ class TournamentMatchsState extends State<TournamentMatchs> {
   }
 
   Widget hourValue(int index) {
-    var date = DateTime.parse(_matchs[index].startDate!);
+    var date = Date.utc(_matchs[index].startDate);
     return padding(
         Text(
           format().format(date),

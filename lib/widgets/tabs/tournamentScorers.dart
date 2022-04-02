@@ -11,6 +11,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:sprintf/sprintf.dart';
 import 'package:montournoi_net_flutter/utils/i18n.dart';
 
+import '../../utils/box.dart';
+
 class TournamentScorersState extends State<TournamentScorers> {
 
   List<Scorer> _scorers = List.empty(growable: false);
@@ -18,17 +20,24 @@ class TournamentScorersState extends State<TournamentScorers> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) => getData());
+  }
+
+  getData() async {
     _populate();
   }
 
   void _populate() {
     EasyLoading.show(status: i18n.loadingLabel);
-    Webservice().load(Tournament.scorers(widget.tournament.id)).then((scorers) => {
+    Webservice().load(Tournament.scorers(context, widget.tournament.id)).then((scorers) => {
       setState(() => {
         _scorers = scorers
       }),
       EasyLoading.dismiss()
-    }, onError: (error) => {EasyLoading.showError(error.toString())});
+    }, onError: (error) => {
+      EasyLoading.dismiss(),
+      EasyLoading.showError(error.toString())
+    });
   }
 
   @override
@@ -36,7 +45,7 @@ class TournamentScorersState extends State<TournamentScorers> {
     return Scaffold(
       body: Center(
         child: Container(
-          decoration: const BoxDecoration(color: Colors.blueAccent),
+          decoration: BoxDecoration(color: Theme.of(context).focusColor),
           child: ListView.builder(
             itemCount: _scorers.length,
             itemBuilder: _buildListViewItem,
@@ -53,7 +62,8 @@ class TournamentScorersState extends State<TournamentScorers> {
           _scorers[index],
           Padding(
             padding: const EdgeInsets.only(
-                top: 8, left: 4, right: 8, bottom: 4),
+                top: 8, left: 4, right: 8, bottom: 4
+            ),
             child: Container(
               height: Constants.MATCHS_HEIGHT,
               color: Colors.white,
@@ -69,7 +79,7 @@ class TournamentScorersState extends State<TournamentScorers> {
         ),
         elevation: Constants.LIST_ELEVATION,
         margin: const EdgeInsets.all(Constants.LIST_MARGIN),
-        shadowColor: Colors.blueAccent,
+        shadowColor: Theme.of(context).primaryColor,
       ),
     );
   }
@@ -78,7 +88,7 @@ class TournamentScorersState extends State<TournamentScorers> {
     return Expanded(
       child: ClipOval(
         child: Padding(
-          padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
+          padding: const EdgeInsets.only(top: 2, left: 2, right: 2, bottom: 2),
           child: CachedNetworkImage(
             imageUrl: scorer?.image?.replaceAll("http:", "https:") ?? "",
             height: Constants.MATCHS_HEIGHT,
@@ -123,20 +133,9 @@ class TournamentScorersState extends State<TournamentScorers> {
     );
   }
 
-  BoxDecoration boxDecoration(Scorer scorer) {
-    return BoxDecoration(
-      border: Border(
-        left: BorderSide(
-          color: HexColor(scorer.color!),
-          width: 16.0,
-        ),
-      ),
-    );
-  }
-
   tileContainer(Scorer scorer, Widget widget) {
     return Container(
-      decoration: boxDecoration(scorer),
+      decoration: Box.boxDecorationScorer(scorer, 16.0),
       padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 0),
       child: widget,
     );
@@ -145,7 +144,7 @@ class TournamentScorersState extends State<TournamentScorers> {
   TextStyle textStyle() {
     return const TextStyle(
         color: Color(0xFF000000),
-        fontSize: 22,
+        fontSize: 14,
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w500
     );
@@ -154,7 +153,7 @@ class TournamentScorersState extends State<TournamentScorers> {
   TextStyle scoreStyle() {
     return const TextStyle(
         color: Color(0xFF000000),
-        fontSize: 18,
+        fontSize: 14,
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w300
     );

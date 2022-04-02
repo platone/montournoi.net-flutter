@@ -21,6 +21,7 @@ Tournament _$TournamentFromJson(Map<String, dynamic> json) => Tournament(
       categories: (json['categories'] as List<dynamic>)
           .map((e) => Category.fromJson(e as Map<String, dynamic>))
           .toList(),
+      live: json['live'] as int?,
     );
 
 Map<String, dynamic> _$TournamentToJson(Tournament instance) =>
@@ -37,4 +38,5 @@ Map<String, dynamic> _$TournamentToJson(Tournament instance) =>
       'sport': instance.sport,
       'name': instance.name,
       'categories': instance.categories,
+      'live': instance.live,
     };

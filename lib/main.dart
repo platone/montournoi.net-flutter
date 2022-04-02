@@ -1,20 +1,20 @@
-import 'dart:js';
-
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:montournoi_net_flutter/utils/constants.dart';
-import 'package:montournoi_net_flutter/widgets/tournamentsList.dart';
-import 'package:montournoi_net_flutter/utils/i18n.dart';
+import 'package:montournoi_net_flutter/utils/theme.dart';
+import 'package:montournoi_net_flutter/widgets/screens/tournamentsList.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:admob_flutter/admob_flutter.dart';
 
 import 'animation/custom_animation.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
   configLoading();
+  Admob.initialize();
 }
 
 void configLoading() {
@@ -35,11 +35,13 @@ void configLoading() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  late String appInfo = "";
+
   @override
   Widget build(BuildContext context) {
+    _init(context);
     return MaterialApp(
       onGenerateTitle: (BuildContext context) =>
         AppLocalizations.of(context)!.applicationTitle,
@@ -52,22 +54,20 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [
         Locale('fr', ''),
       ],
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: Themes.simple(),
       home: AnimatedSplashScreen(
-          duration: 3000,
+          duration: 5000,
           splash: Column(
             children: [
               const Expanded(
                 child: Image(
                   image: AssetImage('assets/loading.png'),
                 ),
-                flex: 1,
+                flex: 4,
               ),
               Expanded(
-                child: Text(AppLocalizations.of(context)?.applicationTitle ?? ""),
-                flex: 1,
+                child: Text(appInfo, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400)),
+                flex: 2,
               ),
             ],
           ),
@@ -77,5 +77,18 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.blueAccent),
       builder: EasyLoading.init(),
     );
+  }
+
+  void _init(BuildContext context) {
+    initApp(context);
+  }
+
+  void initApp(BuildContext context) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String appName = packageInfo.appName;
+    String packageName = packageInfo.packageName;
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
+    appInfo = "v${version} (${buildNumber})";
   }
 }

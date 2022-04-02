@@ -8,25 +8,36 @@ import 'package:montournoi_net_flutter/utils/constants.dart';
 import 'package:montournoi_net_flutter/utils/string.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:montournoi_net_flutter/utils/i18n.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../../models/teamlight.dart';
+import '../../utils/box.dart';
 
 class TournamentTeamsState extends State<TournamentTeams> {
 
-  List<Team> _teams = List.empty(growable: false);
+  List<TeamLight> _teams = List.empty(growable: false);
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) => getData());
+  }
+
+  getData() async {
     _populate();
   }
 
   void _populate() {
     EasyLoading.show(status: i18n.loadingLabel);
-    Webservice().load(Tournament.teams(widget.tournament.id)).then((teams) => {
+    Webservice().load(Tournament.teams(context, widget.tournament.id)).then((teams) => {
       setState(() => {
-        _teams = teams
+        _teams = teams,
       }),
       EasyLoading.dismiss()
-    }, onError: (error) => {EasyLoading.showError(error.toString())});
+    }, onError: (error) => {
+      EasyLoading.dismiss(),
+      EasyLoading.showError(error.toString())
+    });
   }
 
   @override
@@ -34,7 +45,7 @@ class TournamentTeamsState extends State<TournamentTeams> {
     return Scaffold(
       body: Center(
         child: Container(
-          decoration: const BoxDecoration(color: Colors.blueAccent),
+          decoration: BoxDecoration(color: Theme.of(context).focusColor),
           child: ListView.builder(
             itemCount: _teams.length,
             itemBuilder: _buildListViewItem,
@@ -66,7 +77,7 @@ class TournamentTeamsState extends State<TournamentTeams> {
         ),
         elevation: Constants.LIST_ELEVATION,
         margin: const EdgeInsets.all(Constants.LIST_MARGIN),
-        shadowColor: Colors.blueAccent,
+        shadowColor: Theme.of(context).primaryColor,
       ),
     );
   }
@@ -106,20 +117,9 @@ class TournamentTeamsState extends State<TournamentTeams> {
     );
   }
 
-  BoxDecoration boxDecoration(Team team) {
-    return BoxDecoration(
-      border: Border(
-        left: BorderSide(
-          color: HexColor(team.backgroundColor!),
-          width: 16.0,
-        ),
-      ),
-    );
-  }
-
   tileContainer(Team team, Widget widget) {
     return Container(
-      decoration: boxDecoration(team),
+      decoration: Box.boxDecorationTeam(team, 16.0),
       padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 0),
       child: widget,
     );

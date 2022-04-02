@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:montournoi_net_flutter/models/player.dart';
 
 part 'team.g.dart';
 
@@ -11,8 +12,9 @@ class Team {
   final String? textColor;
   final String? image;
   final String? country;
+  final List<Player>? players;
 
-  Team({required this.id,required this.name,required this.backgroundColor,required this.textColor,required this.image,required this.country,});
+  Team({required this.id,required this.name,required this.backgroundColor,required this.textColor,required this.image,required this.country,required this.players,});
 
   factory Team.fromJson(Map<String, dynamic> json) => _$TeamFromJson(json);
 

@@ -5,6 +5,7 @@ import 'package:montournoi_net_flutter/models/tournament.dart';
 import 'package:montournoi_net_flutter/utils/date.dart';
 import 'package:montournoi_net_flutter/utils/email.dart';
 import 'package:montournoi_net_flutter/utils/phone.dart';
+import 'package:montournoi_net_flutter/utils/style.dart';
 
 class TournamentDetailsState extends State<TournamentDetails> {
 
@@ -21,7 +22,6 @@ class TournamentDetailsState extends State<TournamentDetails> {
     var zipcode = widget.tournament.zipcode ?? "";
     var phone = widget.tournament.phone ?? "";
     var email = widget.tournament.email ?? "";
-    var sport = widget.tournament.sport ?? "";
     return BackdropFilter(
       filter: ImageFilter.blur(
         sigmaX: 10,
@@ -30,17 +30,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-              padding: const EdgeInsets.only(
-                  top: 16, left: 28, right: 28, bottom: 16),
-              child: Text(name,
-                style: const TextStyle(
-                  color: Color(0xFF000000),
-                  fontSize: 30,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.bold,
-                ),
-              )),
+          DetailsNameWidget(name: name),
           Padding(
               padding: const EdgeInsets.only(
                   top: 0, left: 16, right: 16, bottom: 8),
@@ -55,7 +45,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         Date.between(widget.tournament, context),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       ),
                     ),
@@ -90,7 +80,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                       street + " " + additional,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 18,
                       ),
                     )
                   ),
@@ -121,7 +111,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         zipcode + " " + city,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       )
                   ),
@@ -147,7 +137,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         Phone.label(phone, context),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       )
                   ),
@@ -178,7 +168,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         Email.label(email, context),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       )
                   ),
@@ -202,6 +192,24 @@ class TournamentDetailsState extends State<TournamentDetails> {
         ],
       ),
     );
+  }
+}
+
+class DetailsNameWidget extends StatelessWidget {
+
+  final String name;
+
+  const DetailsNameWidget({
+    Key? key,
+    required this.name,
+  }) : super(key: key);
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, left: 28, right: 28, bottom: 16),
+      child: Text(name, style: Theme.of(context).textTheme.titleLarge));
   }
 }
 

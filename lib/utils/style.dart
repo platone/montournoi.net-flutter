@@ -1,7 +1,9 @@
 import 'dart:ui';
 
-import 'colors.dart';
-
 class Styles {
-  static TextStyle cardTitle = TextStyle(color: AppColor.DarkBlack, fontSize: 24, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold,);
+  static TextStyle _h1 = TextStyle(color: const Color(0xFF000000), fontSize: 26, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold,);
+
+  static TextStyle? h1() {
+    return _h1;
+  }
 }
