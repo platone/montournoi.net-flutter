@@ -1,13 +1,14 @@
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:montournoi_net_flutter/mixin/refresh.dart';
-import 'package:montournoi_net_flutter/utils/i18n.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../services/webservice.dart';
 
 abstract class AbstractScreen<T extends StatefulWidget, E> extends State<T> with Refresh {
+
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   @override
   void initState() {
@@ -19,28 +20,28 @@ abstract class AbstractScreen<T extends StatefulWidget, E> extends State<T> with
   }
 
   loadData() async {
-    populate(false);
+    populate(true);
   }
 
   postData() async {
   }
 
-  populate(bool refresh) async {
+  populate(bool loader) async {
     throw UnimplementedError();
   }
 
   @override
-  void load(bool refresh, Resource<E> resource, void Function(dynamic param) function) {
-    if(refresh) {
-      EasyLoading.show(status: i18n.loadingLabel);
-    }
+  RefreshController refreshController() {
+    return _refreshController;
+  }
+
+  void load(bool loader, Refresh refresh,  Resource<E> resource, void Function(dynamic param) function) {
+    refresh.startLoading(loader: loader);
     Webservice().load(resource).then((entity) => {
       function(entity),
-      if(refresh) {
-        EasyLoading.dismiss()
-      }
+      refresh.endLoading(loader: loader)
     }, onError: (error) => {
-      EasyLoading.showError(error.toString())
+      refresh.errorLoading(error.toString())
     });
   }
 

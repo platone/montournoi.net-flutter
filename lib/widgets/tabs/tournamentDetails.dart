@@ -1,11 +1,14 @@
 import 'dart:ui';
 
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:montournoi_net_flutter/models/tournament.dart';
 import 'package:montournoi_net_flutter/utils/date.dart';
 import 'package:montournoi_net_flutter/utils/email.dart';
 import 'package:montournoi_net_flutter/utils/phone.dart';
 import 'package:montournoi_net_flutter/utils/style.dart';
+
+import '../../utils/plateform.dart';
 
 class TournamentDetailsState extends State<TournamentDetails> {
 
@@ -30,164 +33,185 @@ class TournamentDetailsState extends State<TournamentDetails> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          DetailsNameWidget(name: name),
-          Padding(
-              padding: const EdgeInsets.only(
-                  top: 0, left: 16, right: 16, bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+          Expanded(child: Column(
               children: [
-                Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Text(
-                        Date.between(widget.tournament, context),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                DetailsNameWidget(name: name),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 0, left: 16, right: 16, bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: Text(
+                            Date.between(widget.tournament, context),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(onPressed: () {}, icon: const Icon(Icons.calendar_today_rounded)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            color: Colors.grey[300],
-            height: 1,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 8, left: 16, right: 16, bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    child: Text(
-                      street + " " + additional,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(onPressed: () {}, icon: const Icon(Icons.calendar_today_rounded)),
+                          ],
+                        ),
                       ),
-                    )
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(onPressed: () {}, icon: const Icon(Icons.navigation_rounded)),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 0, left: 16, right: 16, bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Text(
-                        zipcode + " " + city,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      )
-                  ),
+                Container(
+                  color: Colors.grey[300],
+                  height: 1,
                 ),
-              ],
-            ),
-          ),
-          Container(
-            color: Colors.grey[300],
-            height: 1,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 8, left: 16, right: 16, bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Text(
-                        Phone.label(phone, context),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      )
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 8, left: 16, right: 16, bottom: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      IconButton(onPressed: () {}, icon: const Icon(Icons.phone_in_talk_rounded)),
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Text(
+                              street + " " + additional,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            )
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(onPressed: () {}, icon: const Icon(Icons.navigation_rounded)),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 0, left: 16, right: 16, bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Text(
-                        Email.label(email, context),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      )
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 0, left: 16, right: 16, bottom: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      IconButton(onPressed: () {}, icon: const Icon(Icons.email_rounded)),
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Text(
+                              zipcode + " " + city,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            )
+                        ),
+                      ),
                     ],
                   ),
+                ),
+                Container(
+                  color: Colors.grey[300],
+                  height: 1,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 8, left: 16, right: 16, bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Text(
+                              Phone.label(phone, context),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            )
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(onPressed: () {}, icon: const Icon(Icons.phone_in_talk_rounded)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 0, left: 16, right: 16, bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Text(
+                              Email.label(email, context),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            )
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(onPressed: () {}, icon: const Icon(Icons.email_rounded)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  color: Colors.grey[300],
+                  height: 1,
                 ),
               ],
             ),
           ),
-          Container(
-            color: Colors.grey[300],
-            height: 1,
+          Row(
+            children: [
+              Expanded(child:
+              Container(
+                color: Theme.of(context).primaryColorDark,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0, bottom: 8.0),
+                  child: AdmobBanner(
+                    adUnitId: Plateform.adMobBannerId(context),
+                    adSize: AdmobBannerSize.BANNER,
+                  ),
+                ),
+              ),
+              ),
+            ],
           ),
         ],
       ),

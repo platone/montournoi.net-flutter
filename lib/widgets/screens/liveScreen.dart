@@ -34,7 +34,7 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
 
   @override
   void populate(bool refresh) {
-    load(refresh, Live.live(context, widget.match.id), (param) {setState(() {
+    load(refresh, this, Live.live(context, widget.match.id), (param) {setState(() {
       _live = param;
     });});
   }
@@ -132,7 +132,7 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
               ),
             ),
           ],
-        )
+        ),
       ),
       floatingActionButton: Security.isConnected() ? FloatingActionButton(
         child: const Icon(Icons.add_circle_rounded),

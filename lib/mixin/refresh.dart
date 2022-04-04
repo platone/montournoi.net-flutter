@@ -7,29 +7,33 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 abstract class Refresh {
 
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController refreshController() {
+    throw UnimplementedError();
+  }
 
-  void startLoading({bool refresh = false}) {
-    if(!refresh) {
+  void startLoading({bool loader = false}) {
+    if(loader) {
       EasyLoading.show(status: i18n.loadingLabel);
     }
   }
 
-  void endLoading({bool refresh = false, Exception? error}) {
+  void errorLoading(String status) {
+    EasyLoading.showError(status);
+  }
+
+  void endLoading({bool loader = false, Exception? error}) {
     EasyLoading.dismiss();
     if(null != error) {
       EasyLoading.showError(error.toString());
     }
-    if(refresh) {
-      _refreshController.refreshCompleted();
-    }
+    refreshController().refreshCompleted();
   }
 
   Widget refresher(Widget widget, VoidCallback? callback) {
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: false,
-      controller: _refreshController,
+      controller: refreshController(),
       onRefresh: callback,
       child: widget,
     );

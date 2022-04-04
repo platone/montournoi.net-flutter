@@ -1,54 +1,36 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:montournoi_net_flutter/models/match.dart';
 import 'package:montournoi_net_flutter/models/team.dart';
 import 'package:montournoi_net_flutter/models/tournament.dart';
 import 'package:montournoi_net_flutter/widgets/screens/liveScreen.dart';
-import 'package:montournoi_net_flutter/services/webservice.dart';
 import 'package:montournoi_net_flutter/utils/constants.dart';
 import 'package:montournoi_net_flutter/utils/string.dart';
-import 'package:montournoi_net_flutter/utils/i18n.dart';
 
 import '../../utils/box.dart';
 import '../../utils/date.dart';
+import '../screens/abstractScreen.dart';
 
-class TournamentMatchsState extends State<TournamentMatchs> {
+class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>> {
 
   List<Match> _matchs = List.empty(growable: false);
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) => getData());
-  }
-
-  getData() async {
-    _populate();
-  }
 
   DateFormat format() {
     var dateFormat = AppLocalizations.of(context)!.tournamentTileHourFormat;
     return DateFormat(dateFormat, "fr");
   }
 
-  void _populate() {
-    EasyLoading.show(status: i18n.loadingLabel);
-    Webservice().load(Tournament.matchs(context, widget.tournament.id)).then(
-        (matchs) => {
-              setState(() => {
-                    _matchs = matchs
-                        .where((element) => accept(element))
-                        .toList(growable: true)
-                  }),
-              EasyLoading.dismiss()
-            },
-        onError: (error) => {
-          EasyLoading.dismiss(),
-          EasyLoading.showError(error.toString())
-        });
+  @override
+  void populate(bool loader) {
+    load(loader, this, Tournament.matchs(context, widget.tournament.id), (param) {
+      setState(() {
+        _matchs = param
+            .where((element) => accept(element))
+            .toList(growable: true);
+      });
+    });
   }
 
   bool accept(Match element) {
@@ -70,10 +52,13 @@ class TournamentMatchsState extends State<TournamentMatchs> {
       body: Center(
         child: Container(
           decoration: BoxDecoration(color: Theme.of(context).focusColor),
-          child: ListView.builder(
-            itemCount: _matchs.length,
-            itemBuilder: _buildListViewItem,
-          ),
+          child: refresher(
+              ListView.builder(
+                itemCount: _matchs.length,
+                itemBuilder: _buildListViewItem,
+              ), () {
+                populate(false);
+              }),
         ),
       ),
     );

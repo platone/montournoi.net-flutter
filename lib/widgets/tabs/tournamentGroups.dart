@@ -2,47 +2,29 @@ import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:montournoi_net_flutter/models/group.dart';
 import 'package:montournoi_net_flutter/models/result.dart';
 import 'package:montournoi_net_flutter/models/team.dart';
 import 'package:montournoi_net_flutter/models/tournament.dart';
-import 'package:montournoi_net_flutter/services/webservice.dart';
 import 'package:montournoi_net_flutter/utils/constants.dart';
-import 'package:montournoi_net_flutter/utils/i18n.dart';
 import 'package:montournoi_net_flutter/utils/string.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:montournoi_net_flutter/utils/i18n.dart';
 
 import '../../utils/box.dart';
+import '../screens/abstractScreen.dart';
 
-class TournamentGroupsState extends State<TournamentGroups> {
+class TournamentGroupsState extends AbstractScreen<TournamentGroups, List<Result>>  {
 
   final List<ListItem> _items = [];
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) => getData());
-  }
-
-  getData() async {
-    _populate();
-  }
-
-  void _populate() {
-    EasyLoading.show(status: i18n.loadingLabel);
-    Webservice().load(Tournament.groups(context, widget.tournament.id)).then((results) => {
-          setState(() => {
-            buildItems(results),
-          }),
-          EasyLoading.dismiss()
-        },
-        onError: (error) => {
-          EasyLoading.dismiss(),
-          EasyLoading.showError(error.toString())
-        });
+  void populate(bool loader) {
+    load(loader, this, Tournament.groups(context, widget.tournament.id), (param) {
+      setState(() {
+        _items.clear();
+        buildItems(param);
+      });
+    });
   }
 
   @override
@@ -51,10 +33,13 @@ class TournamentGroupsState extends State<TournamentGroups> {
       body: Center(
         child: Container(
           decoration: BoxDecoration(color: Theme.of(context).focusColor),
-          child: ListView.builder(
-            itemCount: _items.length,
-            itemBuilder: _buildListViewItem,
-          ),
+          child: refresher(
+              ListView.builder(
+                itemCount: _items.length,
+                itemBuilder: _buildListViewItem,
+              ), () {
+            populate(false);
+          }),
         ),
       ),
     );

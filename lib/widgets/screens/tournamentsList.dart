@@ -25,7 +25,6 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
 
   final InAppReview inAppReview = InAppReview.instance;
 
-
   @override
   postData() async {
     if (await inAppReview.isAvailable()) {
@@ -33,32 +32,68 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
     }
   }
 
-  populate(bool refresh) async {
-    var login = await Security.lastLogin();
-    var password = await Security.lastPassword();
-    if(null != login && null != password) {
-      startLoading(refresh: refresh);
-      Webservice().post(Token.authenticate(context, login, password), null).then((token) => {
-        Security.updateToken(token),
-        _populateTournaments(refresh: refresh),
-      }, onError: (error) => {
-        _populateTournaments(refresh: refresh)
+  @override
+  void populate(bool loader) {
+    load(loader, this, Tournament.all(context), (param) {
+      setState(() {
+        _tournaments = param;
       });
-    } else {
-      _populateTournaments(refresh: refresh);
-    }
+    });
   }
 
-  void _populateTournaments({bool refresh = false}) {
-    startLoading(refresh: refresh);
-    Webservice().load(Tournament.all(context)).then((tournaments) => {
-      setState(() => {
-        _tournaments = tournaments,
-      }),
-      endLoading(refresh: refresh)
-    }, onError: (error) => {
-      endLoading(refresh: refresh, error: error),
-    });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).focusColor,
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.applicationName),
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: IconButton(
+              icon: Icon(
+                _connected ? Icons.logout : Icons.login,
+                size: 26.0,
+              ),
+              tooltip: _connected ? AppLocalizations.of(context)!.formLogoutTooltip : AppLocalizations.of(context)!.formLoginTooltip,
+              onPressed: () {
+                _connected ? _processLogout(): _processLogin();
+              },
+            ),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: refresher(
+                ListView.builder(
+                  itemCount: _tournaments.length,
+                  itemBuilder: _buildItemsForListView,
+                ), () {
+              populate(false);
+            }),
+            flex: 7,
+          ),
+          Row(
+            children: [
+              Expanded(child:
+              Container(
+                color: Theme.of(context).primaryColorDark,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0, bottom: 8.0),
+                  child: AdmobBanner(
+                    adUnitId: Plateform.adMobBannerId(context),
+                    adSize: AdmobBannerSize.BANNER,
+                  ),
+                ),
+              ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   ListTile _buildItemsForListView(BuildContext context, int index) {
@@ -149,66 +184,6 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
       ),
     );
   }
-
-  void _onRefresh() async{
-    populate(true);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).focusColor,
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.applicationName),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: IconButton(
-              icon: Icon(
-                _connected ? Icons.logout : Icons.login,
-                size: 26.0,
-              ),
-              tooltip: _connected ? AppLocalizations.of(context)!.formLogoutTooltip : AppLocalizations.of(context)!.formLoginTooltip,
-              onPressed: () {
-                _connected ? _processLogout(): _processLogin();
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: refresher(
-              ListView.builder(
-                itemCount: _tournaments.length,
-                itemBuilder: _buildItemsForListView,
-              ),
-              _onRefresh
-            ),
-            flex: 7,
-          ),
-          Row(
-            children: [
-              Expanded(child:
-                Container(
-                  color: Theme.of(context).primaryColorDark,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0, bottom: 8.0),
-                    child: AdmobBanner(
-                      adUnitId: Plateform.adMobBannerId(context),
-                      adSize: AdmobBannerSize.BANNER,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
 
   void _openTournament(Tournament tournament) {
     Navigator.push(

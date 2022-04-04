@@ -12,31 +12,18 @@ import 'package:sprintf/sprintf.dart';
 import 'package:montournoi_net_flutter/utils/i18n.dart';
 
 import '../../utils/box.dart';
+import '../screens/abstractScreen.dart';
 
-class TournamentScorersState extends State<TournamentScorers> {
+class TournamentScorersState   extends AbstractScreen<TournamentScorers, List<Scorer>> {
 
   List<Scorer> _scorers = List.empty(growable: false);
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) => getData());
-  }
-
-  getData() async {
-    _populate();
-  }
-
-  void _populate() {
-    EasyLoading.show(status: i18n.loadingLabel);
-    Webservice().load(Tournament.scorers(context, widget.tournament.id)).then((scorers) => {
-      setState(() => {
-        _scorers = scorers
-      }),
-      EasyLoading.dismiss()
-    }, onError: (error) => {
-      EasyLoading.dismiss(),
-      EasyLoading.showError(error.toString())
+  void populate(bool loader) {
+    load(loader, this, Tournament.scorers(context, widget.tournament.id), (param) {
+      setState(() {
+        _scorers = param;
+      });
     });
   }
 
@@ -46,10 +33,13 @@ class TournamentScorersState extends State<TournamentScorers> {
       body: Center(
         child: Container(
           decoration: BoxDecoration(color: Theme.of(context).focusColor),
-          child: ListView.builder(
-            itemCount: _scorers.length,
-            itemBuilder: _buildListViewItem,
-          ),
+          child: refresher(
+              ListView.builder(
+                itemCount: _scorers.length,
+                itemBuilder: _buildListViewItem,
+              ), () {
+            populate(false);
+          }),
         ),
       ),
     );
