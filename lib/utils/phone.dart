@@ -12,4 +12,12 @@ class Phone {
     }
     return "";
   }
+
+  static url(String phone, BuildContext context) {
+    if(phone != "") {
+      var emailFormat = AppLocalizations.of(context)!.tournamentPhoneUrlFormat;
+      return sprintf(emailFormat, [phone]);
+    }
+    return "";
+  }
 }

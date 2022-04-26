@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../services/webservice.dart';
+import '../../utils/plateform.dart';
 
 abstract class AbstractScreen<T extends StatefulWidget, E> extends State<T> with Refresh {
 
@@ -24,6 +25,7 @@ abstract class AbstractScreen<T extends StatefulWidget, E> extends State<T> with
   }
 
   postData() async {
+    Plateform.showInterstitial();
   }
 
   populate(bool loader) async {

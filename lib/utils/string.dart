@@ -60,7 +60,15 @@ class StringUtils {
     return "";
   }
 
+  static error(error, context, bool open) {
+    if(error != "") {
+      var format = open ? AppLocalizations.of(context)!.errorOpenFormat : AppLocalizations.of(context)!.errorDefaultFormat;
+      return sprintf(format, [error]);
+    }
+    return AppLocalizations.of(context)!.errorInternal;
+  }
+
   static String location(Tournament tournament) {
-    return '${tournament.street} ${tournament.additional} ${tournament.zipcode} ${tournament.city}';
+    return '${tournament.street ?? ""} ${tournament.additional ?? ""} ${tournament.zipcode ?? ""} ${tournament.city ?? ""}';
   }
 }

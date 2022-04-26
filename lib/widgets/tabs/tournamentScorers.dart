@@ -105,7 +105,7 @@ class TournamentScorersState   extends AbstractScreen<TournamentScorers, List<Sc
           textAlign: TextAlign.start,
         ),
       ),
-      flex: 4,
+      flex: 3,
     );
   }
 
@@ -145,7 +145,7 @@ class TournamentScorersState   extends AbstractScreen<TournamentScorers, List<Sc
         color: Color(0xFF000000),
         fontSize: 14,
         fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.w300
+        fontWeight: FontWeight.w500
     );
   }
 

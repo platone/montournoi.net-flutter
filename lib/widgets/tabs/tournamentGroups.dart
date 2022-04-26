@@ -124,9 +124,18 @@ class TournamentGroups extends StatefulWidget {
 
 abstract class ListItem {
   Widget build(BuildContext context);
+
+  TextStyle textStyle(double size, FontWeight? fontWeight) {
+    return TextStyle(
+        color: const Color(0xFF000000),
+        fontSize: size,
+        fontStyle: FontStyle.normal,
+        fontWeight: fontWeight
+    );
+  }
 }
 
-class GroupItem implements ListItem {
+class GroupItem extends ListItem {
   final Group group;
   GroupItem(this.group);
   @override
@@ -136,17 +145,17 @@ class GroupItem implements ListItem {
       child: Row(
         children: [
           Expanded(
-              flex: 3,
+              flex: 1,
               child: Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
                     group.name ?? "",
-                    style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)
-                ),
+                    style: textStyle(16, FontWeight.w900),
+              ),
               ),
           ),
           Expanded(
-            flex: 2,
+            flex: 1,
             child: ResultItem.buildRow(
                 AppLocalizations.of(context)!.totalPoint,
                 AppLocalizations.of(context)!.totalMatch,
@@ -166,7 +175,7 @@ class GroupItem implements ListItem {
   }
 }
 
-class ResultItem implements ListItem {
+class ResultItem extends ListItem {
   final Result result;
   ResultItem(this.result);
   @override
@@ -180,17 +189,17 @@ class ResultItem implements ListItem {
           child: Row(
             children: [
               Expanded(
-                  flex: 3,
+                  flex: 1,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
+                    padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
                       data.team?.name ?? "",
-                      style: Theme.of(context).textTheme.headline6,
+                      style: textStyle(14, FontWeight.w500),
                     ),
                   )
               ),
               Expanded(
-                flex: 2,
+                flex: 1,
                 child: buildRow(
                     "${data.totalPoint}",
                     "${data.totalMatch}",
@@ -226,13 +235,15 @@ class ResultItem implements ListItem {
     return Row(
       children: [
         Expanded(
-        flex: 1,
-        child: Text(
-            totalPoint,
-              style: TextStyle(color: Colors.black, fontSize: hightSize, fontWeight: hightFontWeight)
+          flex: 2,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+                totalPoint,
+                style: TextStyle(color: Colors.black, fontSize: hightSize, fontWeight: hightFontWeight)
+              ),
           ),
-        ),
-        Expanded(
+        ),Expanded(
           flex: 1,
           child: Align(
             alignment: Alignment.center,

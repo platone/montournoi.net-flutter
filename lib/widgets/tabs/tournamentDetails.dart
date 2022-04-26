@@ -2,13 +2,18 @@ import 'dart:ui';
 
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:montournoi_net_flutter/models/tournament.dart';
 import 'package:montournoi_net_flutter/utils/date.dart';
 import 'package:montournoi_net_flutter/utils/email.dart';
 import 'package:montournoi_net_flutter/utils/phone.dart';
 import 'package:montournoi_net_flutter/utils/style.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:add_2_calendar/add_2_calendar.dart';
 
 import '../../utils/plateform.dart';
+import '../../utils/string.dart';
 
 class TournamentDetailsState extends State<TournamentDetails> {
 
@@ -25,6 +30,11 @@ class TournamentDetailsState extends State<TournamentDetails> {
     var zipcode = widget.tournament.zipcode ?? "";
     var phone = widget.tournament.phone ?? "";
     var email = widget.tournament.email ?? "";
+    var dateBetween = Date.between(widget.tournament, context);
+    var streetAdditional = street + " " + additional;
+    var zipcodeCity = zipcode + " " + city;
+    var phoneText = Phone.label(phone, context);
+    var emailText = Email.label(email, context);
     return BackdropFilter(
       filter: ImageFilter.blur(
         sigmaX: 10,
@@ -36,7 +46,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
           Expanded(child: Column(
               children: [
                 DetailsNameWidget(name: name),
-                Padding(
+                if(dateBetween.trim().isNotEmpty) Padding(
                   padding: const EdgeInsets.only(
                       top: 0, left: 16, right: 16, bottom: 8),
                   child: Row(
@@ -47,7 +57,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 16.0),
                           child: Text(
-                            Date.between(widget.tournament, context),
+                            dateBetween,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
@@ -60,18 +70,20 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            IconButton(onPressed: () {}, icon: const Icon(Icons.calendar_today_rounded)),
+                            IconButton(onPressed: () {
+                              _openCalendar(widget.tournament);
+                            }, icon: const Icon(Icons.calendar_today_rounded)),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                Container(
+                if(dateBetween.trim().isNotEmpty) Container(
                   color: Colors.grey[300],
                   height: 1,
                 ),
-                Padding(
+                if(streetAdditional.trim().isNotEmpty) Padding(
                   padding: const EdgeInsets.only(
                       top: 8, left: 16, right: 16, bottom: 8),
                   child: Row(
@@ -82,7 +94,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Padding(
                             padding: const EdgeInsets.only(left: 16.0),
                             child: Text(
-                              street + " " + additional,
+                              streetAdditional,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
@@ -95,14 +107,16 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            IconButton(onPressed: () {}, icon: const Icon(Icons.navigation_rounded)),
+                            IconButton(onPressed: () {
+                              _openMaps(widget.tournament);
+                            }, icon: const Icon(Icons.navigation_rounded)),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                Padding(
+                if(zipcodeCity.trim().isNotEmpty) Padding(
                   padding: const EdgeInsets.only(
                       top: 0, left: 16, right: 16, bottom: 8),
                   child: Row(
@@ -113,7 +127,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Padding(
                             padding: const EdgeInsets.only(left: 16.0),
                             child: Text(
-                              zipcode + " " + city,
+                              zipcodeCity,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
@@ -121,14 +135,25 @@ class TournamentDetailsState extends State<TournamentDetails> {
                             )
                         ),
                       ),
+                      if(streetAdditional.trim().isEmpty) Expanded(
+                        flex: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(onPressed: () {
+                              _openMaps(widget.tournament);
+                            }, icon: const Icon(Icons.navigation_rounded)),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                Container(
+                if(streetAdditional.trim().isNotEmpty || zipcodeCity.trim().isNotEmpty) Container(
                   color: Colors.grey[300],
                   height: 1,
                 ),
-                Padding(
+                if(phoneText.trim().isNotEmpty) Padding(
                   padding: const EdgeInsets.only(
                       top: 8, left: 16, right: 16, bottom: 8),
                   child: Row(
@@ -139,7 +164,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Padding(
                             padding: const EdgeInsets.only(left: 16.0),
                             child: Text(
-                              Phone.label(phone, context),
+                              phoneText,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
@@ -152,14 +177,16 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            IconButton(onPressed: () {}, icon: const Icon(Icons.phone_in_talk_rounded)),
+                            IconButton(onPressed: () {
+                              _openPhone(widget.tournament);
+                            }, icon: const Icon(Icons.phone_in_talk_rounded)),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                Padding(
+                if(emailText.trim().isNotEmpty) Padding(
                   padding: const EdgeInsets.only(
                       top: 0, left: 16, right: 16, bottom: 8),
                   child: Row(
@@ -170,7 +197,7 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Padding(
                             padding: const EdgeInsets.only(left: 16.0),
                             child: Text(
-                              Email.label(email, context),
+                              emailText,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
@@ -183,7 +210,9 @@ class TournamentDetailsState extends State<TournamentDetails> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            IconButton(onPressed: () {}, icon: const Icon(Icons.email_rounded)),
+                            IconButton(onPressed: () {
+                              _openMail(widget.tournament);
+                            }, icon: const Icon(Icons.email_rounded)),
                           ],
                         ),
                       ),
@@ -216,6 +245,42 @@ class TournamentDetailsState extends State<TournamentDetails> {
         ],
       ),
     );
+  }
+
+  void _openMaps(Tournament tournament) {
+    MapsLauncher.launchQuery(StringUtils.location(tournament));
+  }
+
+  void _openCalendar(Tournament tournament) async {
+    try {
+      final Event event = Event(
+        title: tournament.name ?? "",
+        location: StringUtils.location(tournament),
+        startDate: DateTime.parse(tournament.beginDate!),
+        endDate: DateTime.parse(tournament.endDate!),
+      );
+      Add2Calendar.addEvent2Cal(event);
+    } catch (err) {
+      EasyLoading.showError(StringUtils.error(err, context, false));
+    }
+  }
+
+  void _openPhone(Tournament tournament) async {
+    var _url = Phone.url(widget.tournament.phone ?? "", context);
+    try {
+      await launch(_url);
+    } catch (err) {
+      EasyLoading.showError(StringUtils.error(_url, context, true));
+    }
+  }
+
+  void _openMail(Tournament tournament) async {
+    var _url = Email.url(widget.tournament.email ?? "", context);
+    try {
+      await launch(_url);
+    } catch (err) {
+      EasyLoading.showError(StringUtils.error(_url, context, true));
+    }
   }
 }
 

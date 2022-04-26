@@ -9,7 +9,9 @@
     "tournamentTileDirectButton" : "Direct",
     "tournamentTileStringFormat" : "Le %s",
     "tournamentEmailStringFormat" : "Email: %s",
+    "tournamentEmailUrlFormat" : "mailto: %s",
     "tournamentPhoneStringFormat" : "Téléphone: %s",
+    "tournamentPhoneUrlFormat" : "tel: %s",
     "scorerNumbers" : "%s pts (B:%s, A:%s)",
     "totalPoint" : "Pts",
     "totalMatch" : "J",
@@ -42,11 +44,15 @@
     "eventEventDeleteTitle" : "Suppression",
     "eventEventDeleteDescriptionTitle" : "Confirmer la suppression de l'évènement ?",
     "formLoginTooltip" : "Connexion",
+    "formStoreLogin" : "Rester connecté",
     "endMatchTooltip" : "Cloturer le match",
     "formLogoutTooltip" : "Déconnexion",
     "formLogin" : "Identifiant",
     "formPassword" : "Mot de passe",
     "guestLogin" : "guest@montournoi.net",
     "guestPassword" : "L6quPSS6uzehttng",
-    "noData" : "Aucune donnée !"
+    "noData" : "Aucune donnée !",
+    "errorOpenFormat" : "Impossible d'ouvrir %s",
+    "errorDefaultFormat" : "Erreur %s",
+    "errorInternal" : "Erreur interne"
 }

@@ -34,16 +34,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
   }
 
   bool accept(Match element) {
-    var now = DateTime.now();
-    if (element.startDate != null) {
-      var date = DateTime.parse(element.startDate!);
-      if (widget.past) {
-        return now.isAfter(date);
-      } else {
-        return now.isBefore(date);
-      }
-    }
-    return false;
+    return widget.past && (element.ended ?? false);
   }
 
   @override

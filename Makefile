@@ -42,3 +42,6 @@ icons: ## Get Doctor
 
 build: ## Build Application
 	$(FLUTTER) pub run build_runner build --delete-conflicting-outputs
+
+apk: ## Build APK
+	$(FLUTTER) build apk

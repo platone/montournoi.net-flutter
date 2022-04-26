@@ -12,4 +12,12 @@ class Email {
     }
     return "";
   }
+
+  static url(String email, BuildContext context) {
+    if(email != "") {
+      var emailFormat = AppLocalizations.of(context)!.tournamentEmailUrlFormat;
+      return sprintf(emailFormat, [email]);
+    }
+    return "";
+  }
 }

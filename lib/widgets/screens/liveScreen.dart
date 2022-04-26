@@ -39,9 +39,9 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
     });});
   }
 
-  void authenticate(void Function(dynamic param) function, param) {
-    var login = Security.lastLogin();
-    var password = Security.lastPassword();
+  void authenticate(void Function(dynamic param) function, param) async {
+    var login = await Security.lastLogin();
+    var password = await Security.lastPassword();
     Webservice().post(Token.authenticate(context, login, password), null).then((token) => {
       Security.updateToken(token),
       function(param)
@@ -54,6 +54,7 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
     EasyLoading.show(status: i18n.loadingLabel);
     if(Security.mustAuthenticate()) {
       authenticate(closeMatch, null);
+      Navigator.pop(context);
     } else {
       closeMatch(null);
     }
@@ -63,6 +64,7 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
     EasyLoading.show(status: i18n.loadingLabel);
     if(Security.mustAuthenticate()) {
       authenticate(postEvent, event);
+      Navigator.pop(context);
     } else {
       postEvent(event);
     }
@@ -72,6 +74,7 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
     EasyLoading.show(status: i18n.loadingLabel);
     if(Security.mustAuthenticate()) {
       authenticate(deleteEvent, event);
+      Navigator.pop(context);
     } else {
       deleteEvent(event);
     }
@@ -323,6 +326,7 @@ class _EventDialogState extends State<EventDialog> {
                       player: selectedPlayerValue != null ? "/api/users/${selectedPlayerValue}" : null,
                       subtype: null,
                     ));
+                    Navigator.pop(context);
                   },
                   child: Text(
                     AppLocalizations.of(context)!.eventFormValidateButton,

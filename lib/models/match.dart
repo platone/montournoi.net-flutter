@@ -19,8 +19,9 @@ class Match {
   final Team? visitor;
   final List<Event> events;
   final String? name;
+  final bool? ended;
 
-  Match({required this.id, required this.startDate, required this.receiver, required this.visitor, required this.events, required this.name});
+  Match({required this.id, required this.startDate, required this.receiver, required this.visitor, required this.events, required this.name, required this.ended});
 
   factory Match.fromJson(Map<String, dynamic> json) => _$MatchFromJson(json);
 

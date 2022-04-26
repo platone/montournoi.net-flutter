@@ -18,6 +18,7 @@ abstract class Refresh {
   }
 
   void errorLoading(String status) {
+    endLoading(loader: false);
     EasyLoading.showError(status);
   }
 

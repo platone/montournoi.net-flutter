@@ -7,6 +7,7 @@ import 'package:montournoi_net_flutter/services/webservice.dart';
 import 'package:montournoi_net_flutter/utils/security.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:montournoi_net_flutter/utils/i18n.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 
 class SignUpDialog extends StatefulWidget {
   final Function callback;
@@ -20,6 +21,8 @@ class _SignUpDialogState extends State<SignUpDialog> {
   String? loginValue;
 
   String? passwordValue;
+
+  bool storeValue = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +58,18 @@ class _SignUpDialogState extends State<SignUpDialog> {
           },
           obscureText: true,
         ),
+        Expanded(child:
+          CheckboxListTile(
+            title: Text(AppLocalizations.of(context)!.formStoreLogin,),
+            value: storeValue,
+            onChanged: (newValue) {
+              setState(() {
+                storeValue = newValue ?? false;
+              });
+            },
+            controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+          ),
+        ),
         Row(
           children: [
             Expanded(
@@ -72,7 +87,7 @@ class _SignUpDialogState extends State<SignUpDialog> {
                       EasyLoading.show(status: i18n.loadingLabel);
                       Webservice().post(Token.authenticate(context, loginValue, passwordValue), null).then((token) => {
                         Security.updateToken(token),
-                        Security.updateCredentials(loginValue, passwordValue),
+                        storeValue ? Security.updateCredentials(loginValue, passwordValue) : null,
                         EasyLoading.dismiss(),
                         Navigator.pop(context),
                         widget.callback(Security.isConnected())

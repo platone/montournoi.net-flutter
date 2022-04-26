@@ -113,7 +113,7 @@ class TournamentRankingState  extends AbstractScreen<TournamentRanking, List<Ran
         padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 0),
         child: Text(
           StringUtils.team(team, context),
-          style: textStyle(24),
+          style: textStyle(18),
           textAlign: TextAlign.start,
         ),
       ),

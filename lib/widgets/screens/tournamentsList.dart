@@ -4,7 +4,6 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:montournoi_net_flutter/dialog/signup.dart';
 import 'package:montournoi_net_flutter/models/tournament.dart';
 import 'package:montournoi_net_flutter/widgets/screens/tournamentScreen.dart';
-import 'package:montournoi_net_flutter/services/webservice.dart';
 import 'package:montournoi_net_flutter/utils/constants.dart';
 import 'package:montournoi_net_flutter/utils/date.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -12,8 +11,15 @@ import 'package:montournoi_net_flutter/utils/plateform.dart';
 import 'package:montournoi_net_flutter/utils/security.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:montournoi_net_flutter/utils/string.dart';
-import '../../models/token.dart';
 import '../../models/match.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:montournoi_net_flutter/models/token.dart';
+import 'package:montournoi_net_flutter/services/webservice.dart';
+import 'package:montournoi_net_flutter/utils/security.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:montournoi_net_flutter/utils/i18n.dart';
+import '../../utils/counter.dart';
 import 'abstractScreen.dart';
 import 'liveScreen.dart';
 
@@ -25,9 +31,26 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
 
   final InAppReview inAppReview = InAppReview.instance;
 
+
+  @override
+  preData() async {
+      var login = await Security.lastLogin();
+      var password = await Security.lastPassword();
+      if(login != null && password != null) {
+          EasyLoading.show(status: i18n.loadingLabel);
+          Webservice().post(Token.authenticate(context, login, password), null).then((token) => {
+            Security.updateToken(token),
+            EasyLoading.dismiss(),
+          }, onError: (error) => {
+            EasyLoading.showError(error.toString())
+          });
+      }
+  }
+
   @override
   postData() async {
-    if (await inAppReview.isAvailable()) {
+    super.postData();
+    if (await Counter.needReview() && await inAppReview.isAvailable()) {
       inAppReview.requestReview();
     }
   }
@@ -219,7 +242,7 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LiveScreen(match: Match(id: live, name: null, events: [], receiver: null, startDate: null, visitor: null)),
+          builder: (context) => LiveScreen(match: Match(id: live, name: null, events: [], receiver: null, startDate: null, visitor: null, ended: false)),
         ),
       );
     }

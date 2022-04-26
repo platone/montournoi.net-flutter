@@ -19,6 +19,7 @@ Match _$MatchFromJson(Map<String, dynamic> json) => Match(
           .map((e) => Event.fromJson(e as Map<String, dynamic>))
           .toList(),
       name: json['name'] as String?,
+      ended: json['ended'] as bool?,
     );
 
 Map<String, dynamic> _$MatchToJson(Match instance) => <String, dynamic>{
@@ -28,4 +29,5 @@ Map<String, dynamic> _$MatchToJson(Match instance) => <String, dynamic>{
       'visitor': instance.visitor,
       'events': instance.events,
       'name': instance.name,
+      'ended': instance.ended,
     };
