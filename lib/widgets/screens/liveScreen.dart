@@ -638,9 +638,12 @@ class EventTeamNameWidget extends StatelessWidget {
     return Expanded(
       child: Align(
         alignment: Alignment.centerLeft,
+        child: Padding(
+        padding: const EdgeInsets.only(left: 4, right: 4,),
         child: Text(
-            _live?.target?.events[_index].owner?.name ?? "",
-            style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+          _live?.target?.events[_index].owner?.name ?? "",
+          style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+        ),
         ),
       ),
       flex: 4,
@@ -773,12 +776,19 @@ class TeamNameWidget extends StatelessWidget {
     return Expanded(
         child: Align(
           alignment: Alignment.center,
-          child: Text(
-              _team?.name ?? "",
-              style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w400)
+          child: Padding(
+              padding: const EdgeInsets.only(left: 4, right: 4,),
+              child: Text(
+                _team?.name ?? "",
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                )
+            ),
           ),
         ),
-        flex: 7,
+        flex: 5,
     );
   }
 }

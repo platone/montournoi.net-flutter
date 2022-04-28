@@ -21,7 +21,7 @@
     "totalDiff" : "+/-",
     "typeGoal" : "But",
     "typePenalty" : "Penalité",
-    "typePenaltyShot" : "Penalty",
+    "typePenaltyShot" : "But en or / Tirs de barrage",
     "typeFaceOff" : "Face, à face",
     "typeKeeperSave" : "Arrêt du gardien",
     "typeFaceOffTrue" : "FAF réussi",
@@ -54,5 +54,6 @@
     "noData" : "Aucune donnée !",
     "errorOpenFormat" : "Impossible d'ouvrir %s",
     "errorDefaultFormat" : "Erreur %s",
-    "errorInternal" : "Erreur interne"
+    "errorInternal" : "Erreur interne",
+    "matchTileDateFormat" : "EEEE dd MMMM"
 }

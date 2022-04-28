@@ -31,9 +31,10 @@ class Tournament {
   final String? name;
   final List<Category> categories;
   final int? live;
+  final bool? showScorers;
 
   Tournament({required this.id,required this.endDate, required this.beginDate, required this.street, required this.additional, required this.city,
-    required this.zipcode, required this.phone, required this.email, required this.sport, required this.name, required this.categories, required this.live});
+    required this.zipcode, required this.phone, required this.email, required this.sport, required this.name, required this.categories, required this.live, required this.showScorers});
 
   static Resource<List<Tournament>> all(context) {
     return Resource(
@@ -43,7 +44,7 @@ class Tournament {
           var tournaments = List<Tournament>.empty(growable: true);
           for (var t in list) {
             var tournament = Tournament.fromJson(t);
-            tournaments.add(tournament);
+            tournaments.insert(0, tournament);
           }
           return tournaments;
         }

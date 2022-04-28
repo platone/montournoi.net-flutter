@@ -51,28 +51,6 @@ class TournamentGroupsState extends AbstractScreen<TournamentGroups, List<Result
     );
   }
 
-  Expanded tileImage(Team? team) {
-    var image = team!.image ?? "";
-    return Expanded(
-      child: ClipOval(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
-          child: CachedNetworkImage(
-            imageUrl: team.image?.replaceAll("http:", "https:") ?? "",
-            height: Constants.MATCHS_HEIGHT,
-            width: Constants.MATCHS_HEIGHT,
-            fit: BoxFit.contain,
-            placeholder: (context, url) =>
-            const CircularProgressIndicator(),
-            errorWidget: (context, url, error) =>
-            const Icon(Icons.error),
-          ),
-        ),
-      ),
-      flex: 1,
-    );
-  }
-
   Expanded tileTeam(Team? team, BuildContext context) {
     return Expanded(
       child: Padding(
@@ -145,17 +123,17 @@ class GroupItem extends ListItem {
       child: Row(
         children: [
           Expanded(
-              flex: 1,
+              flex: 4,
               child: Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
                     group.name ?? "",
-                    style: textStyle(16, FontWeight.w900),
-              ),
+                    style: textStyle(14, FontWeight.w700),
+                ),
               ),
           ),
           Expanded(
-            flex: 1,
+            flex: 5,
             child: ResultItem.buildRow(
                 AppLocalizations.of(context)!.totalPoint,
                 AppLocalizations.of(context)!.totalMatch,
@@ -177,6 +155,7 @@ class GroupItem extends ListItem {
 
 class ResultItem extends ListItem {
   final Result result;
+
   ResultItem(this.result);
   @override
   Widget build(BuildContext context) {
@@ -189,7 +168,7 @@ class ResultItem extends ListItem {
           child: Row(
             children: [
               Expanded(
-                  flex: 1,
+                  flex: 4,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
@@ -199,7 +178,7 @@ class ResultItem extends ListItem {
                   )
               ),
               Expanded(
-                flex: 1,
+                flex: 5,
                 child: buildRow(
                     "${data.totalPoint}",
                     "${data.totalMatch}",

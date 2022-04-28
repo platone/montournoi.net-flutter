@@ -15,6 +15,9 @@ import '../screens/abstractScreen.dart';
 
 class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>> {
 
+  List<String> _day = List.empty(growable: true);
+  List<int> _indexes = List.empty(growable: true);
+
   List<Match> _matchs = List.empty(growable: false);
 
   DateFormat format() {
@@ -26,15 +29,35 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
   void populate(bool loader) {
     load(loader, this, Tournament.matchs(context, widget.tournament.id), (param) {
       setState(() {
+        _day.clear();
+        _indexes.clear();
         _matchs = param
             .where((element) => accept(element))
             .toList(growable: true);
+        updateDay();
       });
     });
   }
 
   bool accept(Match element) {
-    return widget.past && (element.ended ?? false);
+    if(widget.past) {
+      return element.ended ?? false;
+    }
+    return !(element.ended ?? false);
+  }
+
+  void updateDay() {
+    int index = 0;
+    for (var match in _matchs) {
+      var startDate = DateTime.parse(match.startDate!);
+      var dateFormat = AppLocalizations.of(context)!.tournamentTileDateFormat;
+      var dayString = DateFormat(dateFormat, "fr").format(startDate);
+      if(!_day.contains(dayString)) {
+        _day.add(dayString);
+        _indexes.add(index);
+      }
+      index++;
+    }
   }
 
   @override
@@ -75,8 +98,19 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
             element.type == 'TYPE_GOAL' &&
             element.owner?.id == _matchs[index].visitor?.id)
         .length;
+    bool addTitle = _indexes.contains(index);
+    var startDate = DateTime.parse(_matchs[index].startDate!);
+    var dateFormat = AppLocalizations.of(context)!.matchTileDateFormat;
+    var dayString = DateFormat(dateFormat, "fr").format(startDate);
     return ListTile(
-      title: Card(
+      title: addTitle ? Padding(
+        padding: const EdgeInsets.only(left: 16.0, bottom: 16.0, top: 16.0),
+        child: Text(
+          dayString.toUpperCase(),
+          style: dateStyle(),
+        ),
+      ) : null,
+      subtitle: Card(
         child: Container(
             decoration: Box.boxDecorationTeams(_matchs[index].receiver, _matchs[index].visitor, 16.0),
             child: InkWell(
@@ -93,7 +127,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
                         child: padding(
                             receiver(index, context, receiverScore > visitorScore),
                             context),
-                        flex: 5,
+                        flex: 6,
                       ),
                       Expanded(
                         child: score(index, context, receiverScore, visitorScore),
@@ -103,7 +137,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
                         child: padding(
                             visitor(index, context, visitorScore > receiverScore),
                             context),
-                        flex: 5,
+                        flex: 6,
                       ),
                     ],
                   ),
@@ -173,7 +207,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
       Team? team, BuildContext context, TextAlign textAlign, bool bold) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 0),
+        padding: const EdgeInsets.only(top: 0, left: 4, right: 4, bottom: 0),
         child: Text(
           StringUtils.team(team, context),
           style: textStyle(bold),
@@ -189,8 +223,8 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
       child: ClipOval(
         child: CachedNetworkImage(
           imageUrl: team?.image?.replaceAll("http:", "https:") ?? "",
-          height: Constants.MATCHS_HEIGHT,
-          width: Constants.MATCHS_HEIGHT,
+          height: Constants.MATCHS_LOGO_HEIGHT,
+          width: Constants.MATCHS_LOGO_HEIGHT,
           fit: BoxFit.contain,
           placeholder: (context, url) => const CircularProgressIndicator(),
           errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -203,7 +237,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
   TextStyle scoresStyle(bool bold) {
     return TextStyle(
         color: const Color(0xFF000000),
-        fontSize: 22,
+        fontSize: 16,
         fontStyle: FontStyle.normal,
         fontWeight: bold ? FontWeight.bold : FontWeight.normal
     );
@@ -212,16 +246,16 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
   TextStyle dateStyle() {
     return const TextStyle(
       color: Color(0xFF000000),
-      fontSize: 18,
+      fontSize: 14,
       fontStyle: FontStyle.normal,
-      fontWeight: FontWeight.normal,
+      fontWeight: FontWeight.w700,
     );
   }
 
   TextStyle textStyle(bool bold) {
     return TextStyle(
       color: const Color(0xFF000000),
-      fontSize: 16,
+      fontSize: 12,
       fontStyle: FontStyle.normal,
       fontWeight: bold ? FontWeight.bold : FontWeight.normal,
       overflow: TextOverflow.ellipsis,
@@ -231,7 +265,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
   TextStyle scoreStyle() {
     return const TextStyle(
       color: Color(0xFF000000),
-      fontSize: 20,
+      fontSize: 14,
       fontStyle: FontStyle.normal,
       fontWeight: FontWeight.bold,
     );

@@ -17,35 +17,47 @@ class TournamentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: DefaultTabController(
-        length: 7,
+        length: (tournament.showScorers ?? true) ? 7 : 6,
         child: Scaffold(
           appBar: AppBar(
             title: Text(tournament.name ?? ""),
-            bottom: const TabBar(
-              tabs: [
-                Tab(icon: Icon(Icons.article_rounded)),
-                Tab(icon: Icon(Icons.access_alarms_rounded)),
-                Tab(icon: Icon(Icons.access_time_rounded)),
-                Tab(icon: Icon(Icons.group_rounded)),
-                Tab(icon: Icon(Icons.account_box_rounded)),
-                Tab(icon: Icon(Icons.sort_rounded)),
-                Tab(icon: Icon(Icons.album_rounded)),
-              ],
+            bottom: TabBar(
+              tabs: generateTabList(),
             ),
           ),
           body: TabBarView(
-            children: [
-              TournamentDetails(tournament: tournament),
-              TournamentMatchs(tournament: tournament, past: false,),
-              TournamentMatchs(tournament: tournament, past: true,),
-              TournamentTeams(tournament: tournament),
-              TournamentGroups(tournament: tournament),
-              TournamentRanking(tournament: tournament),
-              TournamentScorers(tournament: tournament),
-            ],
+            children: generateTabView(),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> generateTabView() {
+    var tabView = List<Widget>.empty(growable: true);
+    tabView.add(TournamentDetails(tournament: tournament));
+    tabView.add(TournamentMatchs(tournament: tournament, past: false,));
+    tabView.add(TournamentMatchs(tournament: tournament, past: true,));
+    tabView.add(TournamentTeams(tournament: tournament));
+    tabView.add(TournamentGroups(tournament: tournament));
+    tabView.add(TournamentRanking(tournament: tournament));
+    if((tournament.showScorers ?? true)) {
+      tabView.add(TournamentScorers(tournament: tournament));
+    }
+    return tabView;
+  }
+
+  List<Widget> generateTabList() {
+    var tabView = List<Widget>.empty(growable: true);
+    tabView.add(const Tab(icon: Icon(Icons.article_rounded)));
+    tabView.add(const Tab(icon: Icon(Icons.access_alarms_rounded)));
+    tabView.add(const Tab(icon: Icon(Icons.access_time_rounded)));
+    tabView.add(const Tab(icon: Icon(Icons.group_rounded)));
+    tabView.add(const Tab(icon: Icon(Icons.account_box_rounded)));
+    tabView.add(const Tab(icon: Icon(Icons.sort_rounded)));
+    if((tournament.showScorers ?? true)) {
+      tabView.add(const Tab(icon: Icon(Icons.album_rounded)));
+    }
+    return tabView;
   }
 }

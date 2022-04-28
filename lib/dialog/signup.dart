@@ -58,17 +58,15 @@ class _SignUpDialogState extends State<SignUpDialog> {
           },
           obscureText: true,
         ),
-        Expanded(child:
-          CheckboxListTile(
-            title: Text(AppLocalizations.of(context)!.formStoreLogin,),
-            value: storeValue,
-            onChanged: (newValue) {
-              setState(() {
-                storeValue = newValue ?? false;
-              });
-            },
-            controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
-          ),
+        CheckboxListTile(
+          title: Text(AppLocalizations.of(context)!.formStoreLogin,),
+          value: storeValue,
+          onChanged: (newValue) {
+            setState(() {
+              storeValue = newValue ?? false;
+            });
+          },
+          controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
         ),
         Row(
           children: [

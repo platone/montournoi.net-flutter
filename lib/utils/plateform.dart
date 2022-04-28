@@ -29,7 +29,10 @@ class Plateform {
       }
       return "";
     }
-    return "ca-app-pub-8400721193062595/1982332751";
+    if(Plateform.isIos(context)) {
+      return "ca-app-pub-8400721193062595/5705226398";
+    }
+    return "ca-app-pub-8400721193062595/6714275484";
   }
 
   static String adMobInterstitielId(BuildContext context) {
@@ -38,6 +41,9 @@ class Plateform {
         return AdmobBanner.testAdUnitId;
       }
       return "";
+    }
+    if(Plateform.isIos(context)) {
+      return "ca-app-pub-8400721193062595/8139818043";
     }
     return "ca-app-pub-8400721193062595/1816531398";
   }

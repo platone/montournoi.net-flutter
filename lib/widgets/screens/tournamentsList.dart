@@ -31,6 +31,7 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
 
   final InAppReview inAppReview = InAppReview.instance;
 
+  final ScrollController _scrollController = ScrollController();
 
   @override
   preData() async {
@@ -72,6 +73,19 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
         title: Text(AppLocalizations.of(context)!.applicationName),
         actions: <Widget>[
           Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: IconButton(
+              icon: const Icon(
+                Icons.calendar_today,
+                size: 26.0,
+              ),
+              tooltip: _connected ? AppLocalizations.of(context)!.formLogoutTooltip : AppLocalizations.of(context)!.formLoginTooltip,
+              onPressed: () {
+                scrollToNextTournament();
+              },
+            ),
+          ),
+          Padding(
             padding: const EdgeInsets.only(right: 20.0),
             child: IconButton(
               icon: Icon(
@@ -93,26 +107,23 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
                 ListView.builder(
                   itemCount: _tournaments.length,
                   itemBuilder: _buildItemsForListView,
+                  controller: _scrollController,
                 ), () {
               populate(false);
             }),
             flex: 7,
           ),
-          Row(
-            children: [
-              Expanded(child:
-              Container(
-                color: Theme.of(context).primaryColorDark,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0, bottom: 8.0),
-                  child: AdmobBanner(
-                    adUnitId: Plateform.adMobBannerId(context),
-                    adSize: AdmobBannerSize.BANNER,
-                  ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).primaryColorDark,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0, bottom: 8.0),
+                child: AdmobBanner(
+                  adUnitId: Plateform.adMobBannerId(context),
+                  adSize: AdmobBannerSize.BANNER,
                 ),
               ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
@@ -254,6 +265,13 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
 
   void _openMaps(Tournament tournament) {
     MapsLauncher.launchQuery(StringUtils.location(tournament));
+  }
+
+  void scrollToNextTournament() {
+    var now = DateTime.now();
+    var index = _tournaments.lastIndexWhere((tournament) => now.isAfter(DateTime.parse(tournament.beginDate!)));
+    var height = 100.0 * index;
+    _scrollController.animateTo(height, duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
   }
 }
 
