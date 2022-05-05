@@ -48,11 +48,11 @@ class Plateform {
     return "ca-app-pub-8400721193062595/1816531398";
   }
 
-  static Future<void> showInterstitial() async {
-    if( await Counter.needInterstitial()) {
+  static Future<void> showInterstitial(BuildContext context) async {
+    if(await Counter.needInterstitial()) {
       AdmobInterstitial? interstitialAd;
       interstitialAd = AdmobInterstitial(
-          adUnitId: AdmobInterstitial.testAdUnitId,
+          adUnitId: Plateform.adMobInterstitielId(context),
           listener: (event, args) {
             if (event == AdmobAdEvent.loaded) {
               interstitialAd?.show();

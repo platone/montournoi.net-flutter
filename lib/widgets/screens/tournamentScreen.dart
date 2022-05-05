@@ -6,21 +6,40 @@ import 'package:montournoi_net_flutter/widgets/tabs/tournamentMatchs.dart';
 import 'package:montournoi_net_flutter/widgets/tabs/tournamentRanking.dart';
 import 'package:montournoi_net_flutter/widgets/tabs/tournamentScorers.dart';
 import 'package:montournoi_net_flutter/widgets/tabs/tournamentTeams.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:showcaseview/showcaseview.dart';
 
-class TournamentScreen extends StatelessWidget {
-  const TournamentScreen({Key? key, required this.tournament})
-      : super(key: key);
-
+class TournamentScreen extends StatefulWidget {
   final Tournament tournament;
+  const TournamentScreen({Key? key, required this.tournament}) : super(key: key);
+  @override
+  createState() => _TournamentScreen();
+}
+
+class _TournamentScreen extends State<TournamentScreen> {
+
+  final GlobalKey _one = GlobalKey();
+  final GlobalKey _two = GlobalKey();
+
+  BuildContext? myContext;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) => Future.delayed(const Duration(milliseconds: 200), () {
+        ShowCaseWidget.of(myContext!)!.startShowCase([_one, _two]);
+      }),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: DefaultTabController(
-        length: (tournament.showScorers ?? true) ? 7 : 6,
+        length: (widget.tournament.showScorers ?? true) ? 7 : 6,
         child: Scaffold(
           appBar: AppBar(
-            title: Text(tournament.name ?? ""),
+            title: Text(widget.tournament.name ?? ""),
             bottom: TabBar(
               tabs: generateTabList(),
             ),
@@ -33,16 +52,43 @@ class TournamentScreen extends StatelessWidget {
     );
   }
 
+  @override
+  Widget buildShowCase(BuildContext context) {
+    return ShowCaseWidget(
+      builder: Builder(
+        builder: (context) {
+          myContext = context;
+          return Scaffold(
+            body: DefaultTabController(
+              length: (widget.tournament.showScorers ?? true) ? 7 : 6,
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text(widget.tournament.name ?? ""),
+                  bottom: TabBar(
+                    tabs: generateTabList(),
+                  ),
+                ),
+                body: TabBarView(
+                  children: generateTabView(),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   List<Widget> generateTabView() {
     var tabView = List<Widget>.empty(growable: true);
-    tabView.add(TournamentDetails(tournament: tournament));
-    tabView.add(TournamentMatchs(tournament: tournament, past: false,));
-    tabView.add(TournamentMatchs(tournament: tournament, past: true,));
-    tabView.add(TournamentTeams(tournament: tournament));
-    tabView.add(TournamentGroups(tournament: tournament));
-    tabView.add(TournamentRanking(tournament: tournament));
-    if((tournament.showScorers ?? true)) {
-      tabView.add(TournamentScorers(tournament: tournament));
+    tabView.add(TournamentDetails(tournament: widget.tournament));
+    tabView.add(TournamentMatchs(tournament: widget.tournament, past: false,));
+    tabView.add(TournamentMatchs(tournament: widget.tournament, past: true,));
+    tabView.add(TournamentTeams(tournament: widget.tournament));
+    tabView.add(TournamentGroups(tournament: widget.tournament));
+    tabView.add(TournamentRanking(tournament: widget.tournament));
+    if((widget.tournament.showScorers ?? true)) {
+      tabView.add(TournamentScorers(tournament: widget.tournament));
     }
     return tabView;
   }
@@ -55,9 +101,21 @@ class TournamentScreen extends StatelessWidget {
     tabView.add(const Tab(icon: Icon(Icons.group_rounded)));
     tabView.add(const Tab(icon: Icon(Icons.account_box_rounded)));
     tabView.add(const Tab(icon: Icon(Icons.sort_rounded)));
-    if((tournament.showScorers ?? true)) {
+    if((widget.tournament.showScorers ?? true)) {
       tabView.add(const Tab(icon: Icon(Icons.album_rounded)));
     }
     return tabView;
+  }
+
+  Widget showCase(Widget widget, description, key) {
+    return Showcase(
+      key: key,
+      title: null,
+      description: description,
+      child: InkWell(
+        onTap: () {},
+        child: widget
+      ),
+    );
   }
 }

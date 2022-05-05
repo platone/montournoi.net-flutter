@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     _init(context);
     return MaterialApp(
+      // showPerformanceOverlay: true,
       onGenerateTitle: (BuildContext context) =>
         AppLocalizations.of(context)!.applicationTitle,
       localizationsDelegates: const [
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
       ],
       theme: Themes.simple(),
       home: AnimatedSplashScreen(
-          duration: 5000,
+          duration: 3000,
           splash: Column(
             children: [
               const Expanded(

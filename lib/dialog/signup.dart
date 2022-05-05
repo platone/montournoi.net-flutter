@@ -32,6 +32,7 @@ class _SignUpDialogState extends State<SignUpDialog> {
         TextFormField(
           key: const Key('username'),
           controller: null,
+          initialValue: Foundation.kDebugMode ? "admin@montournoi.net" : "",
           decoration: InputDecoration(
             hintText: AppLocalizations.of(context)!.formLogin,
             suffixIcon: const Icon(Icons.account_circle),
@@ -46,6 +47,7 @@ class _SignUpDialogState extends State<SignUpDialog> {
         TextFormField(
           key: const Key('password'),
           controller: null,
+          initialValue: Foundation.kDebugMode ? "\$MonTournoi\$" : "",
           decoration: InputDecoration(
             hintText: AppLocalizations.of(context)!.formPassword,
             suffixIcon: const Icon(Icons.password),
@@ -57,16 +59,6 @@ class _SignUpDialogState extends State<SignUpDialog> {
             });
           },
           obscureText: true,
-        ),
-        CheckboxListTile(
-          title: Text(AppLocalizations.of(context)!.formStoreLogin,),
-          value: storeValue,
-          onChanged: (newValue) {
-            setState(() {
-              storeValue = newValue ?? false;
-            });
-          },
-          controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
         ),
         Row(
           children: [

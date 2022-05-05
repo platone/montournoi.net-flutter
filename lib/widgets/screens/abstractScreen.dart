@@ -25,7 +25,7 @@ abstract class AbstractScreen<T extends StatefulWidget, E> extends State<T> with
   }
 
   postData() async {
-    Plateform.showInterstitial();
+    Plateform.showInterstitial(context);
   }
 
   populate(bool loader) async {

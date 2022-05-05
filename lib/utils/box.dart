@@ -31,11 +31,11 @@ class Box {
     return BoxDecoration(
       border: Border(
         left: BorderSide(
-          color: HexColor(receiver?.backgroundColor ?? ""),
+          color: HexColor(receiver?.backgroundColor ?? "#FFFFFF"),
           width: width,
         ),
         right: BorderSide(
-          color: HexColor(visitor?.backgroundColor ?? ""),
+          color: HexColor(visitor?.backgroundColor ?? "#FFFFFF"),
           width: width,
         ),
       ),

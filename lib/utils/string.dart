@@ -24,6 +24,9 @@ class StringUtils {
   static String player(Player? player, BuildContext context) {
     return (player?.firstName ?? "") + (player?.firstName != null ? " " : "") + (player?.lastName ?? "");
   }
+  static String playern(Player? player, BuildContext context) {
+    return (player?.lastNumber != null ? "#${player?.lastNumber} " : "") + (player?.firstName ?? "") + (player?.firstName != null ? " " : "") + (player?.lastName ?? "");
+  }
   static String match(Match? match, BuildContext context) {
     return (match?.receiver?.name ?? "") + " - " + (match?.visitor?.name ?? "") ;
   }

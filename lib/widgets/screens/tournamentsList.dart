@@ -68,7 +68,7 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).focusColor,
+      backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.applicationName),
         actions: <Widget>[
@@ -103,19 +103,22 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
       body: Column(
         children: [
           Expanded(
-            child: refresher(
-                ListView.builder(
-                  itemCount: _tournaments.length,
-                  itemBuilder: _buildItemsForListView,
-                  controller: _scrollController,
-                ), () {
-              populate(false);
-            }),
+            child: Container(
+              decoration: BoxDecoration(color: Theme.of(context).focusColor),
+              child: refresher(
+                  ListView.builder(
+                    itemCount: _tournaments.length,
+                    itemBuilder: _buildItemsForListView,
+                    controller: _scrollController,
+                  ), () {
+                populate(false);
+              }),
+            ),
             flex: 7,
           ),
           Expanded(
             child: Container(
-              color: Theme.of(context).primaryColorDark,
+              color: Theme.of(context).primaryColor,
               child: Padding(
                 padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0, bottom: 8.0),
                 child: AdmobBanner(
@@ -253,7 +256,9 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LiveScreen(match: Match(id: live, name: null, events: [], receiver: null, startDate: null, visitor: null, ended: false)),
+          builder: (context) => LiveScreen(
+              match: Match(id: live, name: null, events: [], receiver: null, startDate: null, visitor: null, ended: false),
+          ),
         ),
       );
     }

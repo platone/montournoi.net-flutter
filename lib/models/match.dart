@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:montournoi_net_flutter/models/category.dart';
 import 'package:montournoi_net_flutter/models/event.dart';
@@ -7,6 +8,8 @@ import 'package:montournoi_net_flutter/models/team.dart';
 import 'package:montournoi_net_flutter/services/webservice.dart';
 import 'package:montournoi_net_flutter/utils/constants.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import '../utils/url.dart';
 
 part 'match.g.dart';
 
@@ -21,9 +24,19 @@ class Match {
   final String? name;
   final bool? ended;
 
-  Match({required this.id, required this.startDate, required this.receiver, required this.visitor, required this.events, required this.name, required this.ended});
+  Match({required this.id, required this.startDate, required this.receiver, required this.visitor, required this.events, required this.name, required this.ended,});
 
   factory Match.fromJson(Map<String, dynamic> json) => _$MatchFromJson(json);
 
   Map<String, dynamic> toJson() => _$MatchToJson(this);
+
+  static Resource teams(BuildContext context, match, receiver, visitor) {
+    var url = URL.url(context, URL.MATCHTEAMS_URL, "/${match}/${receiver}/${visitor}");
+    return Resource(
+        url: url,
+        parse: (response) {
+          return true;
+        }
+    );
+  }
 }

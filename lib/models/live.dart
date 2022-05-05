@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:montournoi_net_flutter/models/match.dart';
 import 'package:montournoi_net_flutter/models/team.dart';
 import 'package:montournoi_net_flutter/models/event.dart';
@@ -17,8 +18,9 @@ class Live {
   Live({this.target, this.next});
 
   static Resource<Live> live(context, id) {
+    var url = URL.url(context, URL.LIVE_URL, "/${id}");
     return Resource(
-        url: URL.url(context, URL.LIVE_URL, "/${id}"),
+        url: url,
         parse: (response) {
           Iterable body = json.decode(response.body);
           List<Match> posts = List<Match>.from(body.map((model)=> Match.fromJson(model)));

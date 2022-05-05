@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:montournoi_net_flutter/models/player.dart';
+
+import '../services/webservice.dart';
+import '../utils/url.dart';
 
 part 'team.g.dart';
 

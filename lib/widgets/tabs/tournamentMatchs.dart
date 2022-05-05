@@ -69,7 +69,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
           child: refresher(
               ListView.builder(
                 itemCount: _matchs.length,
-                itemBuilder: _buildListViewItem,
+                itemBuilder: createListTileWithTeamMatch,
               ), () {
                 populate(false);
               }),
@@ -78,14 +78,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
     );
   }
 
-  ListTile _buildListViewItem(BuildContext context, int index) {
-    if (_matchs[index].receiver == null || _matchs[index].visitor == null) {
-      return createListTileWithoutTeamMatch(index);
-    }
-    return createListTileWithTeamMatch(index, context);
-  }
-
-  ListTile createListTileWithTeamMatch(int index, BuildContext context) {
+  ListTile createListTileWithTeamMatch(BuildContext context, int index) {
     var receiverScore = _matchs[index]
         .events
         .where((element) =>
@@ -102,6 +95,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
     var startDate = DateTime.parse(_matchs[index].startDate!);
     var dateFormat = AppLocalizations.of(context)!.matchTileDateFormat;
     var dayString = DateFormat(dateFormat, "fr").format(startDate);
+    var isAvailable = available(_matchs[index]);
     return ListTile(
       title: addTitle ? Padding(
         padding: const EdgeInsets.only(left: 16.0, bottom: 16.0, top: 16.0),
@@ -119,24 +113,24 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
                   _openLive(_matchs[index]);
                 },
                 child: Container(
-                  height: Constants.MATCHS_HEIGHT,
+                  height: isAvailable ? Constants.MATCHS_HEIGHT : Constants.MATCHS_HEIGHT * 1.25,
                   color: Colors.white,
                   child: Row(
                     children: [
                       Expanded(
-                        child: padding(
+                        child: isAvailable ? padding(
                             receiver(index, context, receiverScore > visitorScore),
-                            context),
+                            context) : const SizedBox.shrink(),
                         flex: 6,
                       ),
                       Expanded(
-                        child: score(index, context, receiverScore, visitorScore),
+                        child: isAvailable ? score(index, context, receiverScore, visitorScore) : title(index, context),
                         flex: 3,
                       ),
                       Expanded(
-                        child: padding(
+                        child: isAvailable ? padding(
                             visitor(index, context, visitorScore > receiverScore),
-                            context),
+                            context) : const SizedBox.shrink(),
                         flex: 6,
                       ),
                     ],
@@ -147,28 +141,6 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
         elevation: Constants.LIST_ELEVATION,
         margin: const EdgeInsets.all(Constants.LIST_MARGIN),
         shadowColor: Theme.of(context).primaryColor,
-      ),
-    );
-  }
-
-  ListTile  createListTileWithoutTeamMatch(int index) {
-    return ListTile(
-      title: Card(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
-          child: Container(
-            height: Constants.MATCHS_HEIGHT,
-            color: Colors.white,
-            child: Text(
-                _matchs[index].name ?? "",
-                style: textStyle(false),
-                textAlign: TextAlign.center,
-              ),
-          ),
-        ),
-        elevation: Constants.LIST_ELEVATION,
-        margin: const EdgeInsets.all(Constants.LIST_MARGIN),
-        shadowColor: Colors.blueAccent,
       ),
     );
   }
@@ -274,10 +246,25 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
   Widget score(int index, BuildContext context, int receiverScore, int visitorScore) {
     var now = DateTime.now();
     var date = Date.utc(_matchs[index].startDate);
-    if (now.isAfter(date)) {
+    if (now.isAfter(date) || (_matchs[index].ended ?? false)) {
       return scoreValue(index, receiverScore, visitorScore);
     }
     return hourValue(index);
+  }
+
+  Widget title(int index, BuildContext context) {
+    return padding(
+        Column(
+          children: [
+            hourValue(index),
+            Text(
+              _matchs[index].name ?? "",
+              style: textStyle(false),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        context);
   }
 
   Widget hourValue(int index) {
@@ -311,7 +298,13 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
       MaterialPageRoute(
         builder: (context) => LiveScreen(match: match),
       ),
-    );
+    ).then((value) {
+      populate(true);
+    });
+  }
+
+  available(Match match) {
+    return match.receiver != null || match.visitor != null;
   }
 }
 class TournamentMatchs extends StatefulWidget {

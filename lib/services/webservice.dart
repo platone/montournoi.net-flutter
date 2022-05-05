@@ -21,7 +21,8 @@ class Webservice {
 
   Future<T> loads<T>(Resource<T> resource, Token? token) async {
     var url = Uri.parse(resource.url);
-    final response = await http.get(url);
+    Map<String, String> headers = createHeaders(null);
+    final response = await http.get(url, headers: headers);
     if(response.statusCode == 200) {
       return resource.parse(response);
     } else {

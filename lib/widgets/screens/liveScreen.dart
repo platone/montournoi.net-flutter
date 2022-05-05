@@ -19,6 +19,8 @@ import 'package:montournoi_net_flutter/utils/string.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:montournoi_net_flutter/utils/plateform.dart';
+import '../../models/livematch.dart';
+import '../../models/liveteam.dart';
 import 'abstractScreen.dart';
 
 import 'package:flutter/foundation.dart' as Foundation;
@@ -27,8 +29,13 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
 
   Live? _live;
 
+  LiveMatch? _liveMatch;
+
+  List<LiveTeam>? _teams;
+
   @override
   postData() {
+    super.postData();
     _subscribe();
   }
 
@@ -36,6 +43,7 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
   void populate(bool refresh) {
     load(refresh, this, Live.live(context, widget.match.id), (param) {setState(() {
       _live = param;
+      loadMatch();
     });});
   }
 
@@ -70,6 +78,15 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
     }
   }
 
+  void posts(param) {
+   //  EasyLoading.show(status: i18n.loadingLabel);
+    if(Security.mustAuthenticate()) {
+      authenticate(associateTeams, param);
+    } else {
+      associateTeams(param);
+    }
+  }
+
   void delete(event) {
     EasyLoading.show(status: i18n.loadingLabel);
     if(Security.mustAuthenticate()) {
@@ -82,6 +99,34 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
 
   void closeMatch(param) {
     Webservice().loads(Live.close(context, _live?.target?.id), Security.lastToken()).then((live) => {
+      EasyLoading.dismiss(),
+    }, onError: (error) => {
+      EasyLoading.showError(error.toString())
+    });
+  }
+
+  void associateTeams(param) {
+    Webservice().loads(Match.teams(context, param.match, param.receiver, param.visitor), Security.lastToken()).then((match) => {
+      EasyLoading.dismiss(),
+      populate(true)
+    }, onError: (error) => {
+      EasyLoading.showError(error.toString())
+    });
+  }
+
+  void loadMatch() {
+    Webservice().load(LiveMatch.one(context, widget.match.id)).then((liveMatch) => {
+      _liveMatch = liveMatch,
+      loadTeams()
+    }, onError: (error) => {
+      EasyLoading.showError(error.toString())
+    });
+  }
+
+  void loadTeams() {
+    var group = _liveMatch?.group?.replaceAll("/api/groups", "");
+    Webservice().load(LiveTeam.group(context, group)).then((teams) => {
+      _teams = teams,
       EasyLoading.dismiss(),
     }, onError: (error) => {
       EasyLoading.showError(error.toString())
@@ -140,7 +185,11 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
       floatingActionButton: Security.isConnected() ? FloatingActionButton(
         child: const Icon(Icons.add_circle_rounded),
         onPressed: () {
-          onAdd();
+          if(canAdd()) {
+            onAdd();
+          } else {
+            showAddEventAlert();
+          }
         },
       ) : null,
     );
@@ -179,19 +228,73 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
 
   List<Widget>? actions() {
     if(Security.isConnected()) {
-      return [IconButton(
-        icon: const Icon(
-          Icons.highlight_off_rounded,
-          size: 26.0,
+      return [
+        IconButton(
+          icon: const Icon(
+            Icons.group_add_rounded,
+            size: 26.0,
+          ),
+          tooltip: AppLocalizations.of(context)!.endMatchTooltip,
+          onPressed: () {
+            if(canChangeTeam()) {
+              _processSelectTeam();
+            } else {
+              showCantChangeTeamAlert();
+            }
+          },
         ),
-        tooltip: AppLocalizations.of(context)!.endMatchTooltip,
-        onPressed: () {
-          _processEndMatch();
-        },
-      )];
+        IconButton(
+          icon: const Icon(
+            Icons.highlight_off_rounded,
+            size: 26.0,
+          ),
+          tooltip: AppLocalizations.of(context)!.endMatchTooltip,
+          onPressed: () {
+            if(canAdd()) {
+              _processEndMatch();
+            } else {
+              showCloseMatchAlert();
+            }
+          },
+        ),
+      ];
     } else {
       return [];
     }
+  }
+
+  void _processSelectTeam() {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return TeamDialog(live: _live!, liveMatch: _liveMatch!, teams: _teams!, callback: (param) {
+            posts(param);
+          });
+        }
+    );
+  }
+
+  void _processAlert(title, content) {
+    Widget cancelButton = ElevatedButton(
+      child: Text(AppLocalizations.of(context)!.closeButton),
+      onPressed:  () {
+        Navigator.pop(context, true);
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        cancelButton,
+      ],
+    );    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   void _processEndMatch() {
@@ -255,7 +358,160 @@ class LiveState extends AbstractScreen<LiveScreen, Live> {
       },
     );
   }
+
+  bool canAdd() {
+    return _live?.target?.receiver != null;
+  }
+
+  bool canChangeTeam() {
+    return _live?.target?.events.isEmpty ?? true;
+  }
+
+  void showAddEventAlert() {
+    _processAlert(
+        AppLocalizations.of(context)!.eventAddAlertTitle,
+        AppLocalizations.of(context)!.eventAddAlertDesriptionTitle
+    );
+  }
+
+  void showCloseMatchAlert() {
+    _processAlert(
+        AppLocalizations.of(context)!.matchCloseAlertTitle,
+        AppLocalizations.of(context)!.matchCloseAlertDesriptionTitle
+    );
+
+  }
+  void showCantChangeTeamAlert() {
+    _processAlert(
+        AppLocalizations.of(context)!.changeTeamAlertTitle,
+        AppLocalizations.of(context)!.changeTeamAlertDesriptionTitle
+    );
+  }
 }
+
+class MatchTeams {
+  final String? match;
+  final String? visitor;
+  final String? receiver;
+
+  MatchTeams({required this.match, required this.visitor, required this.receiver,});
+}
+
+class TeamDialog extends StatefulWidget {
+  final Live live;
+  final LiveMatch liveMatch;
+  final List<LiveTeam> teams;
+  final Function callback;
+  const TeamDialog({Key? key, required this.live, required this.liveMatch, required this.teams, required this.callback}) : super(key: key);
+  @override
+  createState() => _TeamDialogState();
+}
+
+class _TeamDialogState extends State<TeamDialog> {
+  String? selectedReceiverValue;
+  String? selectedVisitorValue;
+
+  List<DropdownMenuItem<String>> receiverListTeamsValues = [];
+  List<DropdownMenuItem<String>> visitorListTeamsValues = [];
+
+  @override
+  void didChangeDependencies() {
+    _initTypeValues();
+  }
+
+  void _initTypeValues() {
+    receiverListTeamsValues = createReceiverListValues();
+    visitorListTeamsValues = createVisitorListValues();
+  }
+
+  List<DropdownMenuItem<String>> createReceiverListValues() {
+    List<DropdownMenuItem<String>> listTeamsValues = [];
+    for (var team in widget.teams) {
+      var item = DropdownMenuItem(
+          child: Text(team.name ?? ""),
+          value: "${team.id}",
+          enabled: selectedReceiverValue != "${team.id}",
+      );
+      listTeamsValues.add(item);
+    }
+    return listTeamsValues;
+  }
+
+  List<DropdownMenuItem<String>> createVisitorListValues() {
+    List<DropdownMenuItem<String>> listTeamsValues = [];
+    for (var team in widget.teams) {
+      var item = DropdownMenuItem(
+          child: Text(team.name ?? ""),
+          value: "${team.id}",
+          enabled: selectedVisitorValue != "${team.id}",
+      );
+      listTeamsValues.add(item);
+    }
+    return listTeamsValues;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(AppLocalizations.of(context)!.eventFormTitle),
+      actions: <Widget>[
+        generateReceiverTeamDropDown(),
+        generateVisitorTeamDropDown(),
+        Row(
+          children: [
+            Expanded(
+                child: DialogButton(
+                  onPressed: () => {
+                    Navigator.pop(context)
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.eventFormCancelButton,
+                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                )),
+            Expanded(
+                child: DialogButton(
+                  onPressed: () {
+                    var param = MatchTeams(match: "${widget.live.target?.id}", receiver: selectedReceiverValue, visitor: selectedVisitorValue);
+                    widget.callback(param);
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.eventFormValidateButton,
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                )),
+          ],
+        )
+      ],
+    );
+  }
+
+  DropdownButtonFormField<String> generateReceiverTeamDropDown() {
+    return DropdownButtonFormField(
+        value: selectedReceiverValue,
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedReceiverValue = newValue!;
+            _initTypeValues();
+          });
+        },
+        items: receiverListTeamsValues);
+  }
+
+  DropdownButtonFormField<String> generateVisitorTeamDropDown() {
+    return DropdownButtonFormField(
+        value: selectedVisitorValue,
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedVisitorValue = newValue!;
+            _initTypeValues();
+          });
+        },
+        items: visitorListTeamsValues);
+  }
+}
+
 class EventDialog extends StatefulWidget {
   final Live live;
   final Function callback;
@@ -427,7 +683,7 @@ class _EventDialogState extends State<EventDialog> {
       players?.forEach((element) {
         items.add(DropdownMenuItem(
           child: Text(
-            StringUtils.player(element, context),
+            StringUtils.playern(element, context),
             style: TextStyle(color: (!ids.contains("${element.id}") ? Colors.black : Colors.black26), fontSize: 14, fontWeight: (!ids.contains("${element.id}") ? FontWeight.w300 : FontWeight.w700)),
           ),
           value: "${element.id}",
@@ -438,7 +694,6 @@ class _EventDialogState extends State<EventDialog> {
     }
     return items;
   }
-
 }
 
 class HeaderWidget extends StatelessWidget {
