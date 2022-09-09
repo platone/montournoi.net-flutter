@@ -18,18 +18,9 @@ class TournamentScreen extends StatefulWidget {
 
 class _TournamentScreen extends State<TournamentScreen> {
 
-  final GlobalKey _one = GlobalKey();
-  final GlobalKey _two = GlobalKey();
-
-  BuildContext? myContext;
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) => Future.delayed(const Duration(milliseconds: 200), () {
-        ShowCaseWidget.of(myContext!)!.startShowCase([_one, _two]);
-      }),
-    );
   }
 
   @override
@@ -48,33 +39,6 @@ class _TournamentScreen extends State<TournamentScreen> {
             children: generateTabView(),
           ),
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget buildShowCase(BuildContext context) {
-    return ShowCaseWidget(
-      builder: Builder(
-        builder: (context) {
-          myContext = context;
-          return Scaffold(
-            body: DefaultTabController(
-              length: (widget.tournament.showScorers ?? true) ? 7 : 6,
-              child: Scaffold(
-                appBar: AppBar(
-                  title: Text(widget.tournament.name ?? ""),
-                  bottom: TabBar(
-                    tabs: generateTabList(),
-                  ),
-                ),
-                body: TabBarView(
-                  children: generateTabView(),
-                ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -105,17 +69,5 @@ class _TournamentScreen extends State<TournamentScreen> {
       tabView.add(const Tab(icon: Icon(Icons.album_rounded)));
     }
     return tabView;
-  }
-
-  Widget showCase(Widget widget, description, key) {
-    return Showcase(
-      key: key,
-      title: null,
-      description: description,
-      child: InkWell(
-        onTap: () {},
-        child: widget
-      ),
-    );
   }
 }

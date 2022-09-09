@@ -27,6 +27,19 @@ class Box {
       ),
     );
   }
+  static BoxDecoration boxDecorationColorBordered(Color color, double width, Color other) {
+    return BoxDecoration(
+      border: Border(
+        left: BorderSide(
+          color: color,
+          width: width,
+        ),
+        bottom: BorderSide(color: other),
+        right: BorderSide(color: other),
+        top: BorderSide(color: other),
+      ),
+    );
+  }
   static BoxDecoration boxDecorationTeams(Team? receiver, Team? visitor, double width) {
     return BoxDecoration(
       border: Border(

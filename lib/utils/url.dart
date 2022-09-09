@@ -12,6 +12,8 @@ class URL {
   static const String MATCH_URL = 'matches';
   static const String AUTHENTICATE_URL = 'authenticate';
   static const String TOURNAMENTS_URL = 'tournaments/research?k=';
+  static const String CLUBS_URL = 'clubs';
+  static const String SCHEDULES_URL = 'schedules/club/%s/%s';
   static const String MATCHS_URL = 'matches/day?t=';
   static const String TEAMS_URL = 'teams/tournament';
   static const String GROUPTEAMS_URL = 'teams/group';

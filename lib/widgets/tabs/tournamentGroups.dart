@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:montournoi_net_flutter/models/group.dart';
 import 'package:montournoi_net_flutter/models/result.dart';
@@ -83,10 +84,20 @@ class TournamentGroupsState extends AbstractScreen<TournamentGroups, List<Result
       groups[result.group]!.add(result);
     }
     for (var group in groups.keys) {
+      var index = 1;
+      var points = -1;
+      var position = "";
       final groupItem = GroupItem(group);
       _items.add(groupItem);
       for (var result in groups[group]!) {
-        final resultItem = ResultItem(result);
+        if(points == -1 || points != result.totalPoint){
+          position = "${index}";
+        } else {
+          position = "-";
+        }
+        points = result.totalPoint ?? 0;
+        index++;
+        final resultItem = ResultItem(result, position);
         _items.add(resultItem);
       }
     }
@@ -155,8 +166,10 @@ class GroupItem extends ListItem {
 
 class ResultItem extends ListItem {
   final Result result;
+  final String position;
 
-  ResultItem(this.result);
+  ResultItem(this.result, this.position,);
+
   @override
   Widget build(BuildContext context) {
     var data = result;
@@ -169,12 +182,31 @@ class ResultItem extends ListItem {
             children: [
               Expanded(
                   flex: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      data.team?.name ?? "",
-                      style: textStyle(14, FontWeight.w500),
-                    ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child:
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4.0),
+                            child: Text(
+                              position,
+                              style: textStyle(16, FontWeight.w700),
+                            ),
+                          ),
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child:
+                          Padding(
+                            padding: const EdgeInsets.only(left: 0.0),
+                            child: Text(
+                              data.team?.name ?? "",
+                              style: textStyle(14, FontWeight.w500),
+                            ),
+                          ),
+                      ),
+                    ],
                   )
               ),
               Expanded(
@@ -185,7 +217,7 @@ class ResultItem extends ListItem {
                     "${data.totalMatchWin}",
                     "${data.totalMatchEqual}",
                     "${data.totalMatchLoose}",
-                    "${data.totalGoal! - data.totalFailure!}",
+                    "${data.totalDiff}",
                     18,
                     14,
                     FontWeight.w900,

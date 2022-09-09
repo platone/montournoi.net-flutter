@@ -69,7 +69,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
           child: refresher(
               ListView.builder(
                 itemCount: _matchs.length,
-                itemBuilder: createListTileWithTeamMatch,
+                itemBuilder: createListTile,
               ), () {
                 populate(false);
               }),
@@ -78,7 +78,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
     );
   }
 
-  ListTile createListTileWithTeamMatch(BuildContext context, int index) {
+  ListTile createListTile(BuildContext context, int index) {
     var receiverScore = _matchs[index]
         .events
         .where((element) =>
@@ -121,7 +121,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
                         child: isAvailable ? padding(
                             receiver(index, context, receiverScore > visitorScore),
                             context) : const SizedBox.shrink(),
-                        flex: 6,
+                        flex: flexFor(_matchs[index].receiver),
                       ),
                       Expanded(
                         child: isAvailable ? score(index, context, receiverScore, visitorScore) : title(index, context),
@@ -131,7 +131,7 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
                         child: isAvailable ? padding(
                             visitor(index, context, visitorScore > receiverScore),
                             context) : const SizedBox.shrink(),
-                        flex: 6,
+                        flex: flexFor(_matchs[index].visitor),
                       ),
                     ],
                   ),
@@ -305,6 +305,10 @@ class TournamentMatchsState extends AbstractScreen<TournamentMatchs, List<Match>
 
   available(Match match) {
     return match.receiver != null || match.visitor != null;
+  }
+
+  flexFor(Team? team) {
+    return null != team ? 6 : 0;
   }
 }
 class TournamentMatchs extends StatefulWidget {

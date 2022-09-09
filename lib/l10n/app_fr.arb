@@ -18,6 +18,9 @@
     "totalMatchWin" : "G",
     "totalMatchEqual" : "N",
     "totalMatchLoose" : "P",
+    "totalGoal" : "B",
+    "totalAssist" : "A",
+    "totalPenality" : "P",
     "totalDiff" : "+/-",
     "closeButton" : "Fermer",
     "typeGoal" : "But",
@@ -65,5 +68,16 @@
     "errorOpenFormat" : "Impossible d'ouvrir %s",
     "errorDefaultFormat" : "Erreur %s",
     "errorInternal" : "Erreur interne",
-    "matchTileDateFormat" : "EEEE dd MMMM"
+    "goToNextTournament" : "Prochain tournoi",
+    "homeTournament" : "Les tournois",
+    "homeCalendars" : "Les horaires",
+    "homeClubs" : "Les clubs",
+    "titleFormat" : "%s : horaires",
+    "matchTileDateFormat" : "EEEE dd MMMM",
+    "scheduleTileDateFormat" : "EEEE dd/MM",
+    "scheduleWeekDateFormat" : "dd/MM",
+    "scheduleWeekTextFormat" : "Du %s au %s",
+    "headerCat" : "Cat.",
+    "headerIce" : "Gla.",
+    "headerOffice" : "HG."
 }

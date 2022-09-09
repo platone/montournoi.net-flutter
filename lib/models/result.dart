@@ -15,6 +15,8 @@ class Result {
 
   final int? totalPoint;
 
+  final int? totalDiff;
+
   final int? totalMatchWin;
 
   final int? totalMatchWinInOverTime;
@@ -31,7 +33,7 @@ class Result {
 
   final int? totalPenalty;
 
-  Result({required this.group, required this.team, required this.totalMatch, required this.totalPoint, required this.totalMatchWin,
+  Result({required this.group, required this.team, required this.totalMatch, required this.totalPoint,required this.totalDiff, required this.totalMatchWin,
     required this.totalMatchWinInOverTime, required this.totalMatchLoose, required this.totalMatchLooseInOverTime, required this.totalMatchEqual,
     required this.totalGoal, required this.totalFailure, required this.totalPenalty});
 

@@ -16,13 +16,22 @@ import '../screens/abstractScreen.dart';
 
 class TournamentScorersState   extends AbstractScreen<TournamentScorers, List<Scorer>> {
 
+  String? selectedTeamValue;
+
+  List<DropdownMenuItem<String>> teamsValues = [];
+
   List<Scorer> _scorers = List.empty(growable: false);
+
+  List<Scorer> _filteredScorers = List.empty(growable: false);
 
   @override
   void populate(bool loader) {
     load(loader, this, Tournament.scorers(context, widget.tournament.id), (param) {
       setState(() {
         _scorers = param;
+        selectedTeamValue = null;
+        initFilter();
+        updateScorer();
       });
     });
   }
@@ -35,7 +44,7 @@ class TournamentScorersState   extends AbstractScreen<TournamentScorers, List<Sc
           decoration: BoxDecoration(color: Theme.of(context).focusColor),
           child: refresher(
               ListView.builder(
-                itemCount: _scorers.length,
+                itemCount: _filteredScorers.length + 1,
                 itemBuilder: _buildListViewItem,
               ), () {
             populate(false);
@@ -46,30 +55,112 @@ class TournamentScorersState   extends AbstractScreen<TournamentScorers, List<Sc
   }
 
   ListTile _buildListViewItem(BuildContext context, int index) {
+    if(index == 0) {
+      return _buildListViewHeaderItem(context, index);
+    }
+    return _buildListViewPlayerItem(context, index - 1);
+  }
+
+  final teamDropDownKey = GlobalKey<FormState>();
+
+  ListTile _buildListViewHeaderItem(BuildContext context, int index) {
+    return ListTile(
+      title: Container(
+        padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 0),
+        child: Container(
+          height: Constants.MATCHS_HEIGHT,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 7,
+                child: Padding(
+                  padding: EdgeInsets.only(),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: generateTeamDropDown(),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.clear,
+                        ),
+                        onPressed: () {
+                          populate(true);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: buildRow(
+                  AppLocalizations.of(context)!.totalPoint,
+                  AppLocalizations.of(context)!.totalGoal,
+                  AppLocalizations.of(context)!.totalAssist,
+                  AppLocalizations.of(context)!.totalPenality,
+                  14,
+                  12,
+                  FontWeight.w500,
+                  FontWeight.w500,
+                ),
+              ),
+
+              // tileImage(_scorers[index]),
+              // tileNumber(points(_scorers[index]), context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  ListTile _buildListViewPlayerItem(BuildContext context, int index) {
+    var scorer = _filteredScorers[index];
+    var total = scorer.total;
+    var goal = scorer.goal;
+    var assists = int.parse(scorer.firstAssist!) + int.parse(scorer.secondAssist!);
+    var penalities = scorer.penalities;
     return ListTile(
       title: Card(
         child: tileContainer(
-          _scorers[index],
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 8, left: 4, right: 8, bottom: 4
-            ),
-            child: Container(
+          scorer,
+            Container(
               height: Constants.MATCHS_HEIGHT,
-              color: Colors.white,
               child: Row(
                 children: [
-                  tileImage(_scorers[index]),
-                  tileTeam(_scorers[index], context),
-                  tileNumber(points(_scorers[index]), context),
+                  Expanded(
+                    flex: 7,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4.0),
+                      child: Row(
+                        children: [
+                          tileImage(scorer),
+                          tileTeam(scorer, context),
+                        ],
+                      )
+                    ),
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: buildRow(
+                      "${total}",
+                      "${goal}",
+                      "${assists}",
+                      "${penalities}",
+                      14,
+                      12,
+                      FontWeight.w500,
+                      FontWeight.w500,
+                    ),
+                  ),
+
+                  // tileImage(_scorers[index]),
+                  // tileNumber(points(_scorers[index]), context),
                 ],
               ),
             ),
-          ),
         ),
-        elevation: Constants.LIST_ELEVATION,
-        margin: const EdgeInsets.all(Constants.LIST_MARGIN),
-        shadowColor: Theme.of(context).primaryColor,
       ),
     );
   }
@@ -78,11 +169,11 @@ class TournamentScorersState   extends AbstractScreen<TournamentScorers, List<Sc
     return Expanded(
       child: ClipOval(
         child: Padding(
-          padding: const EdgeInsets.only(top: 2, left: 2, right: 2, bottom: 2),
+          padding: const EdgeInsets.only(),
           child: CachedNetworkImage(
             imageUrl: scorer?.image?.replaceAll("http:", "https:") ?? "",
-            height: Constants.MATCHS_HEIGHT,
-            width: Constants.MATCHS_HEIGHT,
+            height: Constants.MATCHS_LOGOM_HEIGHT,
+            width: Constants.MATCHS_LOGOM_HEIGHT,
             fit: BoxFit.contain,
             placeholder: (context, url) =>
             const CircularProgressIndicator(),
@@ -155,6 +246,95 @@ class TournamentScorersState   extends AbstractScreen<TournamentScorers, List<Sc
     var assists = int.parse(scorer.firstAssist!) + int.parse(scorer.secondAssist!);
     var scorerFormat = AppLocalizations.of(context)!.scorerNumbers;
     return sprintf(scorerFormat, [total, goal, assists]);
+  }
+
+  static Row buildRow(String totalPoint, String totalGoal, String totalAssist, String totalPenality, double hightSize, double lowSize, FontWeight? hightFontWeight, FontWeight? lowFontWeight) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+                totalPoint,
+                style: TextStyle(color: Colors.black, fontSize: hightSize, fontWeight: hightFontWeight)
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+                totalGoal,
+                style: TextStyle(color: Colors.black, fontSize: lowSize, fontWeight: lowFontWeight)
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+                totalAssist,
+                style: TextStyle(color: Colors.black, fontSize: lowSize, fontWeight: lowFontWeight)
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+                totalPenality,
+                style: TextStyle(color: Colors.black, fontSize: lowSize, fontWeight: lowFontWeight)
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void initFilter() {
+    teamsValues = createTeamValues();
+  }
+
+  List<DropdownMenuItem<String>> createTeamValues() {
+    var teams = {};
+    List<DropdownMenuItem<String>> values = [];
+    for (var scorer in _scorers) {
+      var team = scorer.team;
+      if(!teams.containsKey(team)) {
+        var item = DropdownMenuItem(
+          child: Text(team ?? ""),
+          value: "${scorer.team}",
+        );
+        values.add(item);
+        teams[team] = true;
+      }
+    }
+    return values;
+  }
+
+  DropdownButtonFormField<String> generateTeamDropDown() {
+    return DropdownButtonFormField(
+        key: teamDropDownKey,
+        value: selectedTeamValue,
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedTeamValue = newValue!;
+            updateScorer();
+          });
+        },
+        items: teamsValues);
+  }
+
+  void updateScorer() {
+    if((selectedTeamValue ?? "").isNotEmpty) {
+      _filteredScorers = _scorers.where((element) => element.team == selectedTeamValue).toList(growable: false);
+    }else {
+      _filteredScorers = _scorers;
+    }
   }
 }
 

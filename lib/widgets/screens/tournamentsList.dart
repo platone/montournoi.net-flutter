@@ -76,10 +76,10 @@ class TournamentsState extends AbstractScreen<TournamentsList, List<Tournament>>
             padding: const EdgeInsets.only(right: 4.0),
             child: IconButton(
               icon: const Icon(
-                Icons.calendar_today,
+                Icons.arrow_circle_down_sharp,
                 size: 26.0,
               ),
-              tooltip: _connected ? AppLocalizations.of(context)!.formLogoutTooltip : AppLocalizations.of(context)!.formLoginTooltip,
+              tooltip: AppLocalizations.of(context)!.goToNextTournament,
               onPressed: () {
                 scrollToNextTournament();
               },

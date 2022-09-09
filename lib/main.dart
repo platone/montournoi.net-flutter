@@ -4,6 +4,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:montournoi_net_flutter/utils/theme.dart';
+import 'package:montournoi_net_flutter/widgets/screens/clubsList.dart';
+import 'package:montournoi_net_flutter/widgets/screens/homeScreen.dart';
 import 'package:montournoi_net_flutter/widgets/screens/tournamentsList.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -72,7 +74,7 @@ class MyApp extends StatelessWidget {
               ),
             ],
           ),
-          nextScreen: const TournamentsList(),
+          nextScreen: const HomeScreen(),
           splashTransition: SplashTransition.fadeTransition,
           pageTransitionType: PageTransitionType.fade,
           backgroundColor: Colors.blueAccent),
