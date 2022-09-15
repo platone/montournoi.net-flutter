@@ -27,9 +27,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCalendarsUsageDescription</key>
-	<string>$(PRODUCT_NAME) peut accéder au calendrier.</string>
+	<string>MonTournoi peut accéder au calendrier afin de vous permettre d'enregistrer les dates des matchs.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) peut utiliser la caméra.</string>
+	<string>MonTournoi peut utiliser la caméra afin de prendre des photos des matchs, des équipes et des joueurs.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
